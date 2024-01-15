@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,7 +36,7 @@ public class MenuController
 
 //	Api for save particular menu
 	@PostMapping("/savemenu/{restid}")
-	public ResponseEntity<Menu> saveMenus(@PathVariable("restid") int restid, @RequestParam String name,
+	public ResponseEntity<String> saveMenus(@PathVariable("restid") int restid, @RequestParam String name,
 			@RequestParam("foodimg") MultipartFile foodimg, @RequestParam("isveg") boolean isveg,
 			@RequestParam("discount") int discount, @RequestParam("foodtype") String foodtype,
 			@RequestParam("ispopular") boolean ispopular, @RequestParam("carbs") int carbs,
@@ -66,18 +67,20 @@ public class MenuController
 				menu.setCalories(calories);
 				menu.setFooddetails(fooddetails);
 				menuRepos.save(menu);
-				return ResponseEntity.ok(menu);
+				return ResponseEntity.status(HttpStatus.OK).body("Menu Saved");
 			} catch (IOException e)
 			{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 
-				return ResponseEntity.internalServerError().build();
+				return ResponseEntity.internalServerError().body("Server Error");
 			}
 
 		} else
 		{
-			return ResponseEntity.notFound().build();
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Restaurant with ID " + restid + " not found");
+
+//			return ResponseEntity.notFound().build();
 //			return ResponseEntity.status(404).build();
 		}
 	}
