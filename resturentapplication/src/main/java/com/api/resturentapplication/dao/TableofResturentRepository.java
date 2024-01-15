@@ -1,0 +1,12 @@
+package com.api.resturentapplication.dao;
+
+import java.util.Optional;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.api.resturentapplication.entities.TablesOfResturant;
+
+public interface TableofResturentRepository extends JpaRepository<TablesOfResturant, Integer>
+{
+	Optional<TablesOfResturant> findByTableidAndResturant_id(int tableid,int resturant_id);
+}
