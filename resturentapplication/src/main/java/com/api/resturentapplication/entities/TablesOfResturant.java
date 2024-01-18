@@ -25,8 +25,7 @@ public class TablesOfResturant
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 
-	@Column(unique = true)
-	private int tableid;
+
 
 	@ManyToOne
 	@JsonIgnore
@@ -37,14 +36,13 @@ public class TablesOfResturant
 //	@OneToOne
 //	private Order_menus order_menus;
 
-	@OneToMany(mappedBy = "tablesOfResturant", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "tables", cascade = CascadeType.ALL)
 	List<Order_menus> order_menus = new ArrayList<>();
 
 	public TablesOfResturant(int id, int tableid, Resturant resturant, List<Order_menus> order_menus)
 	{
 		super();
 		this.id = id;
-		this.tableid = tableid;
 		this.resturant = resturant;
 		this.order_menus = order_menus;
 	}
@@ -64,15 +62,6 @@ public class TablesOfResturant
 		this.id = id;
 	}
 
-	public int getTableid()
-	{
-		return tableid;
-	}
-
-	public void setTableid(int tableid)
-	{
-		this.tableid = tableid;
-	}
 
 	public Resturant getResturant()
 	{
@@ -97,7 +86,7 @@ public class TablesOfResturant
 	@Override
 	public String toString()
 	{
-		return "TablesOfResturant [id=" + id + ", tableid=" + tableid + ", resturant=" + resturant + ", order_menus="
+		return "TablesOfResturant [id=" + id +   ", resturant=" + resturant + ", order_menus="
 				+ order_menus + "]";
 	}
 

@@ -17,43 +17,53 @@ import jakarta.persistence.OneToMany;
 
 @Entity
 @Component
-public class Resturant {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+public class Resturant
+{
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private int id;
 
-    private String rest_name;
+	private String rest_name;
 
-    @OneToMany(mappedBy = "resturant", cascade = CascadeType.ALL)
-    List<Menu> menus = new ArrayList<>();
-    
-    @OneToMany(mappedBy = "resturant", cascade = CascadeType.ALL )
-    List<TablesOfResturant> tablesOfResturants = new ArrayList<>();
-    
-    @OneToMany(mappedBy = "resturant")
-    List<Order_menus> order_menus = new ArrayList<>();
-    
-    
+	private int additionaldiscount;
 
-	public Resturant(int id, String rest_name, List<Menu> menus, List<TablesOfResturant> tablesOfResturants,
-			List<Order_menus> order_menus)
+	@OneToMany(mappedBy = "resturant", cascade = CascadeType.ALL)
+	List<Menu> menus = new ArrayList<>();
+
+	@OneToMany(mappedBy = "resturant", cascade = CascadeType.ALL)
+	List<TablesOfResturant> tablesOfResturants = new ArrayList<>();
+
+	@OneToMany(mappedBy = "resturant")
+	List<Order_menus> order_menus = new ArrayList<>();
+
+	public Resturant(int id, String rest_name, int additionaldiscount, List<Menu> menus,
+			List<TablesOfResturant> tablesOfResturants, List<Order_menus> order_menus)
 	{
 		super();
 		this.id = id;
 		this.rest_name = rest_name;
+		this.additionaldiscount = additionaldiscount;
 		this.menus = menus;
 		this.tablesOfResturants = tablesOfResturants;
 		this.order_menus = order_menus;
 	}
 
-	
-	
 	public Resturant()
 	{
 //		super();
 	}
+	
+	
 
+	public int getAdditionaldiscount()
+	{
+		return additionaldiscount;
+	}
 
+	public void setAdditionaldiscount(int additionaldiscount)
+	{
+		this.additionaldiscount = additionaldiscount;
+	}
 
 	public int getId()
 	{
@@ -105,19 +115,12 @@ public class Resturant {
 		this.order_menus = order_menus;
 	}
 
-
-
 	@Override
 	public String toString()
 	{
 		return "Resturant [id=" + id + ", rest_name=" + rest_name + ", menus=" + menus + ", tablesOfResturants="
 				+ tablesOfResturants + ", order_menus=" + order_menus + "]";
 	}
-	
-	
-    
-    
-    
 
 //    public int getId() {
 //        return id;

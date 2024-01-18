@@ -12,6 +12,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
@@ -28,24 +29,36 @@ public class Order_menus
 	@JsonIgnore
 	private Resturant resturant;
 
-	private String menu_name;
+	private int status;
 
 	@ManyToOne
 	@JsonIgnore
-	private TablesOfResturant tablesOfResturant;
+	private TablesOfResturant tables;
 
 	@ManyToOne
 	@JsonIgnore
 	private Menu menus;
 
-	public Order_menus(int id, Resturant resturant, String menu_name, TablesOfResturant tablesOfResturant, Menu menues)
+	public Order_menus(int id, Resturant resturant, String menu_name, int status, TablesOfResturant tablesOfResturant,
+			Menu menus)
 	{
 		super();
 		this.id = id;
 		this.resturant = resturant;
-		this.menu_name = menu_name;
-		this.tablesOfResturant = tablesOfResturant;
-		this.menus = menues;
+
+		this.status = status;
+		this.tables = tablesOfResturant;
+		this.menus = menus;
+	}
+
+	public int getStatus()
+	{
+		return status;
+	}
+
+	public void setStatus(int status)
+	{
+		this.status = status;
 	}
 
 	public Menu getMenus()
@@ -61,16 +74,6 @@ public class Order_menus
 	public Order_menus()
 	{
 //		super();
-	}
-
-	public String getMenu_name()
-	{
-		return menu_name;
-	}
-
-	public void setMenu_name(String menu_name)
-	{
-		this.menu_name = menu_name;
 	}
 
 	public int getId()
@@ -93,14 +96,14 @@ public class Order_menus
 		this.resturant = resturant;
 	}
 
-	public TablesOfResturant getTablesOfResturant()
+	public TablesOfResturant getTables()
 	{
-		return tablesOfResturant;
+		return tables;
 	}
 
-	public void setTablesOfResturant(TablesOfResturant tablesOfResturant)
+	public void setTables(TablesOfResturant tables)
 	{
-		this.tablesOfResturant = tablesOfResturant;
+		this.tables = tables;
 	}
 
 //	@OneToMany(mappedBy = "order_menus", cascade = CascadeType.ALL)

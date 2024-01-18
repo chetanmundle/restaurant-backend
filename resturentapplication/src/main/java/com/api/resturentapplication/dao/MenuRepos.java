@@ -16,4 +16,6 @@ public interface MenuRepos extends JpaRepository<Menu, Integer> {
 	Optional<List<Menu>> findByResturant_id(int restid);
 	
 	Optional<List<Menu>> findByIsveg(boolean isveg);
+	
+	Optional<List<Menu>> findByResturant_idAndFoodtype(int resturant_id,String foodtype);
 }

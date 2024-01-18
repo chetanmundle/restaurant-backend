@@ -8,5 +8,5 @@ import com.api.resturentapplication.entities.TablesOfResturant;
 
 public interface TableofResturentRepository extends JpaRepository<TablesOfResturant, Integer>
 {
-	Optional<TablesOfResturant> findByTableidAndResturant_id(int tableid,int resturant_id);
+	Optional<TablesOfResturant> findByIdAndResturant_id(int tableid,int resturant_id);
 }

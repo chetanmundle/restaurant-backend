@@ -38,10 +38,12 @@ public class MenuController
 	@PostMapping("/savemenu/{restid}")
 	public ResponseEntity<String> saveMenus(@PathVariable("restid") int restid, @RequestParam String name,
 			@RequestParam("foodimg") MultipartFile foodimg, @RequestParam("isveg") boolean isveg,
-			@RequestParam("discount") int discount, @RequestParam("foodtype") String foodtype,
-			@RequestParam("ispopular") boolean ispopular, @RequestParam("carbs") int carbs,
-			@RequestParam("proteins") int proteins, @RequestParam("calories") int calories,
-			@RequestParam("fooddetails") String fooddetails,@RequestParam("price") int price)
+			@RequestParam(name = "discount", required = false, defaultValue = "0") int discount,
+			@RequestParam(name = "foodtype",required = false,defaultValue = "") String foodtype,
+			@RequestParam(name = "ispopular", required = false, defaultValue = "false") boolean ispopular,
+			@RequestParam(name = "carbs", required = false, defaultValue = "0") int carbs,
+			@RequestParam(name = "proteins",required = false,defaultValue = "0") int proteins, @RequestParam(name = "calories",required = false,defaultValue = "0") int calories,
+			@RequestParam("fooddetails") String fooddetails, @RequestParam("price") int price)
 	{
 
 		Menu menu = new Menu();
@@ -124,17 +126,40 @@ public class MenuController
 			return ResponseEntity.notFound().build();
 		}
 	}
-	
+
 //	 Get on menu by Id
 	@GetMapping("/getmenu/{menuid}")
 	public ResponseEntity<Optional<Menu>> getMenuById(@PathVariable("menuid") int menuid)
 	{
 		Optional<Menu> findById = menuRepos.findById(menuid);
-		
-		if(findById.isPresent())
+
+		if (findById.isPresent())
 		{
 			return ResponseEntity.ok(findById);
-		}else {
+		} else
+		{
+			return ResponseEntity.notFound().build();
+		}
+	}
+
+//	get foods by there type eg. pizza, burger
+	@GetMapping("/getmenu/byperticularfood/{restid}/{foodtype}")
+	public ResponseEntity<Optional<List<Menu>>> getPerticularfoodMenus(@PathVariable("restid") int restid,
+			@PathVariable("foodtype") String foodtype)
+	{
+		Optional<Resturant> findById = restRepos.findById(restid);
+
+		if (findById.isPresent())
+		{
+//			Resturant resturant = findById.get();
+//			Menu menu = new Menu();
+//			
+//			menu.setResturant(resturant);
+			Optional<List<Menu>> findByResturantidAndFoodtype = menuRepos.findByResturant_idAndFoodtype(restid,
+					foodtype);
+			return ResponseEntity.ok(findByResturantidAndFoodtype);
+		} else
+		{
 			return ResponseEntity.notFound().build();
 		}
 	}
