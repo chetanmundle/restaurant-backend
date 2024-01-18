@@ -70,18 +70,17 @@ public class MenuController
 				menu.setCalories(calories);
 				menu.setFooddetails(fooddetails);
 				menuRepos.save(menu);
-				return ResponseEntity.status(HttpStatus.OK).body("Menu Saved");
+				return ResponseEntity.status(HttpStatus.OK).build();
 			} catch (IOException e)
 			{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 
-				return ResponseEntity.internalServerError().body("Server Error");
-			}
+				return ResponseEntity.internalServerError().build();			}
 
 		} else
 		{
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Restaurant with ID " + restid + " not found");
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
 //			return ResponseEntity.notFound().build();
 //			return ResponseEntity.status(404).build();
