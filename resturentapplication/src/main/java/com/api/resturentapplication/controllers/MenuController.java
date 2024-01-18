@@ -36,13 +36,14 @@ public class MenuController
 
 //	Api for save particular menu
 	@PostMapping("/savemenu/{restid}")
-	public ResponseEntity<String> saveMenus(@PathVariable("restid") int restid, @RequestParam String name,
+	public ResponseEntity<String> saveMenus(@PathVariable("restid") int restid, @RequestParam("name") String name,
 			@RequestParam("foodimg") MultipartFile foodimg, @RequestParam("isveg") boolean isveg,
 			@RequestParam(name = "discount", required = false, defaultValue = "0") int discount,
-			@RequestParam(name = "foodtype",required = false,defaultValue = "") String foodtype,
+			@RequestParam(name = "foodtype", required = false, defaultValue = "") String foodtype,
 			@RequestParam(name = "ispopular", required = false, defaultValue = "false") boolean ispopular,
 			@RequestParam(name = "carbs", required = false, defaultValue = "0") int carbs,
-			@RequestParam(name = "proteins",required = false,defaultValue = "0") int proteins, @RequestParam(name = "calories",required = false,defaultValue = "0") int calories,
+			@RequestParam(name = "proteins", required = false, defaultValue = "0") int proteins,
+			@RequestParam(name = "calories", required = false, defaultValue = "0") int calories,
 			@RequestParam("fooddetails") String fooddetails, @RequestParam("price") int price)
 	{
 

@@ -117,7 +117,9 @@ public class Menu
 		this.name = name;
 	}
 
-	public boolean isIsveg()
+	
+
+	public boolean getIsveg()
 	{
 		return isveg;
 	}
@@ -147,7 +149,7 @@ public class Menu
 		this.foodtype = foodtype;
 	}
 
-	public boolean isIspopular()
+	public boolean getIspopular()
 	{
 		return ispopular;
 	}

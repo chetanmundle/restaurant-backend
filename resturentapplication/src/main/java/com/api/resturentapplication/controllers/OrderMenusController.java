@@ -1,5 +1,9 @@
 package com.api.resturentapplication.controllers;
 
+import java.util.Map;
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -69,7 +73,6 @@ public class OrderMenusController
 				order_menus.setMenus(menu);
 				order_menus.setTables(tablesOfResturant);
 				order_menus.setStatus(1);
-				
 
 				orderMenusRepository.save(order_menus);
 				return ResponseEntity.ok().build();
@@ -84,6 +87,52 @@ public class OrderMenusController
 		}
 
 	}
-	
-	
+
+	@GetMapping("/findmenusoftable/{restid}/{tableid}")
+	public ResponseEntity<List<Map<String, Object>>> findByTableAndRest(@PathVariable("tableid") int tableid,
+			@PathVariable("restid") int restid)
+	{
+		List<Order_menus> orderMenusList = orderMenusRepository.findByTables_IdAndResturant_Id(tableid, restid);
+
+		if (!orderMenusList.isEmpty())
+		{
+			List<Map<String, Object>> responseList = new ArrayList<>();
+
+			for (Order_menus orderMenus : orderMenusList)
+			{
+				Map<String, Object> orderMap = new HashMap<>();
+//	                orderMap.put("id", orderMenus.getId());
+//	                orderMap.put("status", orderMenus.getStatus());
+
+				// Include restaurant details
+//	                Resturant restaurant = orderMenus.getResturant();
+//	                orderMap.put("restaurant_id", restaurant.getId());
+//	                orderMap.put("restaurant_name", restaurant.getRest_name());
+				
+//				include table details
+				TablesOfResturant tablesOfResturant = orderMenus.getTables();
+				orderMap.put("tableid", tablesOfResturant.getId());
+
+				// Include menu details
+				Menu menu = orderMenus.getMenus();
+				orderMap.put("id", menu.getId());
+				orderMap.put("name", menu.getName());
+				orderMap.put("foodtype", menu.getFoodtype());
+				orderMap.put("isveg", menu.getIsveg());
+				orderMap.put("discount", menu.getDiscount());
+				orderMap.put("ispopular", menu.getIspopular());
+				orderMap.put("carbs", menu.getCarbs());
+				orderMap.put("proteins", menu.getProteins());
+				orderMap.put("calories", menu.getCalories());
+				orderMap.put("fooddetails", menu.getFooddetails());
+				responseList.add(orderMap);
+			}
+
+			return ResponseEntity.ok().body(responseList);
+		} else
+		{
+			return ResponseEntity.notFound().build();
+		}
+	}
+
 }
