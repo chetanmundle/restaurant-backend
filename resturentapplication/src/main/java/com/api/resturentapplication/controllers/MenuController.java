@@ -37,7 +37,7 @@ public class MenuController
 //	Api for save particular menu
 	@PostMapping("/savemenu/{restid}")
 	public ResponseEntity<String> saveMenus(@PathVariable("restid") int restid, @RequestParam("name") String name,
-			@RequestParam("foodimg") MultipartFile foodimg, @RequestParam("isveg") boolean isveg,
+			@RequestParam(name = "foodimg",required = false) MultipartFile foodimg, @RequestParam("isveg") boolean isveg,
 			@RequestParam(name = "discount", required = false, defaultValue = "0") int discount,
 			@RequestParam(name = "foodtype", required = false, defaultValue = "") String foodtype,
 			@RequestParam(name = "ispopular", required = false, defaultValue = "false") boolean ispopular,
@@ -163,5 +163,27 @@ public class MenuController
 			return ResponseEntity.notFound().build();
 		}
 	}
+	
+	
+//	get api with veg or nonveg menus type = isveg
+	@GetMapping("/getmenu/byperticularfood/type/{restid}/{type}/{foodtype}")
+	public ResponseEntity<Optional<List<Menu>>> getPerticularfoodMenuswithvegnonveg(@PathVariable("restid")int restid,@PathVariable("type") String type,@PathVariable("foodtype") String foodtype)
+	{
+		boolean isveg = false;
+		Optional<Resturant> findById = restRepos.findById(restid);
+		
+		if(findById.isPresent())
+		{
+			if(type.equals("veg")) {
+				isveg = true;
+			}
+			Optional<List<Menu>> findByResturant_idAndFoodtypeAndIsveg = menuRepos.findByResturant_idAndFoodtypeAndIsveg(restid, foodtype, isveg);
+			return ResponseEntity.ok(findByResturant_idAndFoodtypeAndIsveg);
+		}else {
+			return ResponseEntity.notFound().build();
+		}
+	}
+	
+
 
 }
