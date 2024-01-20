@@ -189,6 +189,7 @@ public class OrderMenusController
 				}else {
 					order_menus.setQuantity(quantity - 1);
 					orderMenusRepository.save(order_menus);
+					
 					return ResponseEntity.ok().build();
 				}
 			} catch (Exception e)
