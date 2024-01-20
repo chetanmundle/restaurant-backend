@@ -38,17 +38,30 @@ public class Order_menus
 	@ManyToOne
 	@JsonIgnore
 	private Menu menus;
+	
+	private int quantity;
 
-	public Order_menus(int id, Resturant resturant, String menu_name, int status, TablesOfResturant tablesOfResturant,
-			Menu menus)
+	
+
+	public Order_menus(int id, Resturant resturant, int status, TablesOfResturant tables, Menu menus, int quantity)
 	{
 		super();
 		this.id = id;
 		this.resturant = resturant;
-
 		this.status = status;
-		this.tables = tablesOfResturant;
+		this.tables = tables;
 		this.menus = menus;
+		this.quantity = quantity;
+	}
+
+	public int getQuantity()
+	{
+		return quantity;
+	}
+
+	public void setQuantity(int quantity)
+	{
+		this.quantity = quantity;
 	}
 
 	public int getStatus()

@@ -9,11 +9,13 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -73,6 +75,7 @@ public class OrderMenusController
 				order_menus.setMenus(menu);
 				order_menus.setTables(tablesOfResturant);
 				order_menus.setStatus(1);
+				order_menus.setQuantity(1);
 
 				orderMenusRepository.save(order_menus);
 				return ResponseEntity.ok().build();
@@ -88,49 +91,111 @@ public class OrderMenusController
 
 	}
 
-	@GetMapping("/findmenusoftable/{restid}/{tableid}")
+	@GetMapping("/findmenusoftable/{restid}/{tableid}/{status}")
 	public ResponseEntity<List<Map<String, Object>>> findByTableAndRest(@PathVariable("tableid") int tableid,
-			@PathVariable("restid") int restid)
+			@PathVariable("restid") int restid,@PathVariable("status") int status)
 	{
-		List<Order_menus> orderMenusList = orderMenusRepository.findByTables_IdAndResturant_Id(tableid, restid);
+		List<Order_menus> orderMenusList = orderMenusRepository.findByTables_IdAndResturant_IdAndStatus(tableid, restid,status);
 
 		if (!orderMenusList.isEmpty())
 		{
-			List<Map<String, Object>> responseList = new ArrayList<>();
-
-			for (Order_menus orderMenus : orderMenusList)
+			try
 			{
-				Map<String, Object> orderMap = new HashMap<>();
-//	                orderMap.put("id", orderMenus.getId());
-//	                orderMap.put("status", orderMenus.getStatus());
+				List<Map<String, Object>> responseList = new ArrayList<>();
 
-				// Include restaurant details
-//	                Resturant restaurant = orderMenus.getResturant();
-//	                orderMap.put("restaurant_id", restaurant.getId());
-//	                orderMap.put("restaurant_name", restaurant.getRest_name());
+				for (Order_menus orderMenus : orderMenusList)
+				{
+					Map<String, Object> orderMap = new HashMap<>();
+		                orderMap.put("ordermenu_id", orderMenus.getId());
+		                orderMap.put("status", orderMenus.getStatus());
+		                orderMap.put("quantity", orderMenus.getQuantity());
+
+					// Include restaurant details
+//		                Resturant restaurant = orderMenus.getResturant();
+//		                orderMap.put("restaurant_id", restaurant.getId());
+//		                orderMap.put("restaurant_name", restaurant.getRest_name());
+					
+//					include table details
+					TablesOfResturant tablesOfResturant = orderMenus.getTables();
+					orderMap.put("tableid", tablesOfResturant.getId());
+					
+
+					// Include menu details
+					Menu menu = orderMenus.getMenus();
+					orderMap.put("id", menu.getId());
+					orderMap.put("name", menu.getName());
+					orderMap.put("foodtype", menu.getFoodtype());
+					orderMap.put("isveg", menu.getIsveg());
+					orderMap.put("discount", menu.getDiscount());
+					orderMap.put("ispopular", menu.getIspopular());
+					orderMap.put("carbs", menu.getCarbs());
+					orderMap.put("proteins", menu.getProteins());
+					orderMap.put("calories", menu.getCalories());
+					orderMap.put("fooddetails", menu.getFooddetails());
+					orderMap.put("foodimg", menu.getFoodimg());
 				
-//				include table details
-				TablesOfResturant tablesOfResturant = orderMenus.getTables();
-				orderMap.put("tableid", tablesOfResturant.getId());
+					responseList.add(orderMap);
+				}
 
-				// Include menu details
-				Menu menu = orderMenus.getMenus();
-				orderMap.put("id", menu.getId());
-				orderMap.put("name", menu.getName());
-				orderMap.put("foodtype", menu.getFoodtype());
-				orderMap.put("isveg", menu.getIsveg());
-				orderMap.put("discount", menu.getDiscount());
-				orderMap.put("ispopular", menu.getIspopular());
-				orderMap.put("carbs", menu.getCarbs());
-				orderMap.put("proteins", menu.getProteins());
-				orderMap.put("calories", menu.getCalories());
-				orderMap.put("fooddetails", menu.getFooddetails());
-				responseList.add(orderMap);
+				return ResponseEntity.ok().body(responseList);
+			} catch (Exception e)
+			{
+				return ResponseEntity.internalServerError().build();
 			}
-
-			return ResponseEntity.ok().body(responseList);
 		} else
 		{
+			return ResponseEntity.notFound().build();
+		}
+	}
+	
+	
+//	API for increase Quantity of ordermenu
+	@PutMapping("/increasequantity/{orderid}")
+	public ResponseEntity<HttpStatus> inscreaseQuantityofItem(@PathVariable("orderid") int orderid)
+	{
+		Optional<Order_menus> findById = orderMenusRepository.findById(orderid);
+		
+		if(findById.isPresent())
+		{
+			try
+			{
+				Order_menus order_menus = findById.get();
+				order_menus.setQuantity(order_menus.getQuantity() + 1);
+				orderMenusRepository.save(order_menus);
+				return ResponseEntity.ok().build();
+			} catch (Exception e)
+			{
+				return ResponseEntity.internalServerError().build();
+			}
+		}else {
+			return ResponseEntity.notFound().build();
+		}
+	}
+	
+//	API for the Quantity decrease of ordermenu
+	@PutMapping("/decreasequantity/{orderid}")
+	public ResponseEntity<HttpStatus> decreaseQuantityOfItem(@PathVariable("orderid") int orderid)
+	{
+		Optional<Order_menus> findById = orderMenusRepository.findById(orderid);
+		if(findById.isPresent())
+		{
+			try
+			{
+				Order_menus order_menus = findById.get();
+				int quantity = order_menus.getQuantity();
+				if(quantity == 1 ) {
+					orderMenusRepository.deleteById(orderid);
+					return ResponseEntity.ok().build();
+				}else {
+					order_menus.setQuantity(quantity - 1);
+					orderMenusRepository.save(order_menus);
+					return ResponseEntity.ok().build();
+				}
+			} catch (Exception e)
+			{
+				return ResponseEntity.internalServerError().build();
+			}
+		}else {
 			return ResponseEntity.notFound().build();
 		}
 	}
