@@ -217,7 +217,7 @@ public class OrderMenusController
 			return ResponseEntity.notFound().build();
 		}
 	}
-//	
+//	ghj
 //	get the final price of the particular table with status
 	@GetMapping("/getfinalprice/{restid}/{tableid}/{status}")
 	public ResponseEntity<Integer> getTotalPriceofTable(
