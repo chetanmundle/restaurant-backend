@@ -40,10 +40,15 @@ public class Order_menus
 	private Menu menus;
 	
 	private int quantity;
+	
+	private int totalprice;
 
 	
 
-	public Order_menus(int id, Resturant resturant, int status, TablesOfResturant tables, Menu menus, int quantity)
+	
+
+	public Order_menus(int id, Resturant resturant, int status, TablesOfResturant tables, Menu menus, int quantity,
+			int totalprice)
 	{
 		super();
 		this.id = id;
@@ -52,7 +57,24 @@ public class Order_menus
 		this.tables = tables;
 		this.menus = menus;
 		this.quantity = quantity;
+		this.totalprice = totalprice;
 	}
+	
+	
+
+	public int getTotalprice()
+	{
+		return totalprice;
+	}
+
+
+
+	public void setTotalprice(int totalprice)
+	{
+		this.totalprice = totalprice;
+	}
+
+
 
 	public int getQuantity()
 	{

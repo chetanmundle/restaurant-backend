@@ -76,6 +76,10 @@ public class OrderMenusController
 				order_menus.setTables(tablesOfResturant);
 				order_menus.setStatus(1);
 				order_menus.setQuantity(1);
+				int price =menu.getPrice();
+				int discount = menu.getDiscount();
+				order_menus.setTotalprice(price - (price * discount/100));
+				
 
 				orderMenusRepository.save(order_menus);
 				return ResponseEntity.ok().build();
@@ -105,10 +109,12 @@ public class OrderMenusController
 
 				for (Order_menus orderMenus : orderMenusList)
 				{
+//					System.out.println("Ordermenulist .....:"+orderMenus);
 					Map<String, Object> orderMap = new HashMap<>();
 		                orderMap.put("ordermenu_id", orderMenus.getId());
 		                orderMap.put("status", orderMenus.getStatus());
 		                orderMap.put("quantity", orderMenus.getQuantity());
+		                orderMap.put("totalprice", orderMenus.getTotalprice());
 
 					// Include restaurant details
 //		                Resturant restaurant = orderMenus.getResturant();
@@ -132,6 +138,7 @@ public class OrderMenusController
 					orderMap.put("proteins", menu.getProteins());
 					orderMap.put("calories", menu.getCalories());
 					orderMap.put("fooddetails", menu.getFooddetails());
+					
 					orderMap.put("foodimg", menu.getFoodimg());
 				
 					responseList.add(orderMap);
@@ -160,8 +167,13 @@ public class OrderMenusController
 			try
 			{
 				Order_menus order_menus = findById.get();
-				order_menus.setQuantity(order_menus.getQuantity() + 1);
+				Menu menu = order_menus.getMenus();
+				int Qt = order_menus.getQuantity() + 1;
+				order_menus.setQuantity(Qt);
+				int discountedPriceOnOneQT = menu.getPrice() - (menu.getPrice() * menu.getDiscount() / 100);
+				order_menus.setTotalprice(Qt * discountedPriceOnOneQT);
 				orderMenusRepository.save(order_menus);
+				
 				return ResponseEntity.ok().build();
 			} catch (Exception e)
 			{
@@ -182,12 +194,17 @@ public class OrderMenusController
 			try
 			{
 				Order_menus order_menus = findById.get();
+				
 				int quantity = order_menus.getQuantity();
 				if(quantity == 1 ) {
 					orderMenusRepository.deleteById(orderid);
 					return ResponseEntity.ok().build();
 				}else {
-					order_menus.setQuantity(quantity - 1);
+					Menu menu = order_menus.getMenus();
+					int Qt = quantity - 1;
+					order_menus.setQuantity(Qt);
+					int discountedPriceOnOneQT = menu.getPrice() - (menu.getPrice() * menu.getDiscount() / 100);
+					order_menus.setTotalprice(Qt * discountedPriceOnOneQT);
 					orderMenusRepository.save(order_menus);
 					
 					return ResponseEntity.ok().build();
@@ -199,6 +216,34 @@ public class OrderMenusController
 		}else {
 			return ResponseEntity.notFound().build();
 		}
+	}
+	
+//	get the final price of the perticular table with status
+	@GetMapping("/getfinalprice/{restid}/{tableid}/{status}")
+	public ResponseEntity<Integer> getTotalPriceofTable(
+	    @PathVariable("restid") int restid,
+	    @PathVariable("tableid") int tableid,
+	    @PathVariable("status") int status
+	) {
+	    List<Order_menus> orderMenusList = orderMenusRepository.findByTables_IdAndResturant_IdAndStatus(tableid, restid, status);
+
+	    if (!orderMenusList.isEmpty()) {
+	        try {
+	            int finalbillprice = 0;
+
+	            for (Order_menus orderMenus : orderMenusList) {
+	                int price = orderMenus.getTotalprice();
+	                finalbillprice += price;
+	            }
+
+	            return ResponseEntity.ok(finalbillprice);
+	        } catch (Exception e) {
+	        	
+	            return ResponseEntity.internalServerError().build();
+	        }
+	    } else {
+	        return ResponseEntity.notFound().build();
+	    }
 	}
 
 }
