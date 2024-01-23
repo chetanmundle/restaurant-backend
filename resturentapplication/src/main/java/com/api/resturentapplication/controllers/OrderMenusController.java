@@ -76,10 +76,9 @@ public class OrderMenusController
 				order_menus.setTables(tablesOfResturant);
 				order_menus.setStatus(1);
 				order_menus.setQuantity(1);
-				int price =menu.getPrice();
+				int price = menu.getPrice();
 				int discount = menu.getDiscount();
-				order_menus.setTotalprice(price - (price * discount/100));
-				
+				order_menus.setTotalprice(price - (price * discount / 100));
 
 				orderMenusRepository.save(order_menus);
 				return ResponseEntity.ok().build();
@@ -97,9 +96,10 @@ public class OrderMenusController
 
 	@GetMapping("/findmenusoftable/{restid}/{tableid}/{status}")
 	public ResponseEntity<List<Map<String, Object>>> findByTableAndRest(@PathVariable("tableid") int tableid,
-			@PathVariable("restid") int restid,@PathVariable("status") int status)
+			@PathVariable("restid") int restid, @PathVariable("status") int status)
 	{
-		List<Order_menus> orderMenusList = orderMenusRepository.findByTables_IdAndResturant_IdAndStatus(tableid, restid,status);
+		List<Order_menus> orderMenusList = orderMenusRepository.findByTables_IdAndResturant_IdAndStatus(tableid, restid,
+				status);
 
 		if (!orderMenusList.isEmpty())
 		{
@@ -111,20 +111,19 @@ public class OrderMenusController
 				{
 //					System.out.println("Ordermenulist .....:"+orderMenus);
 					Map<String, Object> orderMap = new HashMap<>();
-		                orderMap.put("ordermenu_id", orderMenus.getId());
-		                orderMap.put("status", orderMenus.getStatus());
-		                orderMap.put("quantity", orderMenus.getQuantity());
-		                orderMap.put("totalprice", orderMenus.getTotalprice());
+					orderMap.put("ordermenu_id", orderMenus.getId());
+					orderMap.put("status", orderMenus.getStatus());
+					orderMap.put("quantity", orderMenus.getQuantity());
+					orderMap.put("totalprice", orderMenus.getTotalprice());
 
 					// Include restaurant details
 //		                Resturant restaurant = orderMenus.getResturant();
 //		                orderMap.put("restaurant_id", restaurant.getId());
 //		                orderMap.put("restaurant_name", restaurant.getRest_name());
-					
+
 //					include table details
 					TablesOfResturant tablesOfResturant = orderMenus.getTables();
 					orderMap.put("tableid", tablesOfResturant.getId());
-					
 
 					// Include menu details
 					Menu menu = orderMenus.getMenus();
@@ -138,9 +137,9 @@ public class OrderMenusController
 					orderMap.put("proteins", menu.getProteins());
 					orderMap.put("calories", menu.getCalories());
 					orderMap.put("fooddetails", menu.getFooddetails());
-					
+
 					orderMap.put("foodimg", menu.getFoodimg());
-				
+
 					responseList.add(orderMap);
 				}
 
@@ -154,15 +153,14 @@ public class OrderMenusController
 			return ResponseEntity.notFound().build();
 		}
 	}
-	
-	
+
 //	API for increase Quantity of ordermenu
 	@PutMapping("/increasequantity/{orderid}")
 	public ResponseEntity<HttpStatus> inscreaseQuantityofItem(@PathVariable("orderid") int orderid)
 	{
 		Optional<Order_menus> findById = orderMenusRepository.findById(orderid);
-		
-		if(findById.isPresent())
+
+		if (findById.isPresent())
 		{
 			try
 			{
@@ -173,78 +171,113 @@ public class OrderMenusController
 				int discountedPriceOnOneQT = menu.getPrice() - (menu.getPrice() * menu.getDiscount() / 100);
 				order_menus.setTotalprice(Qt * discountedPriceOnOneQT);
 				orderMenusRepository.save(order_menus);
-				
+
 				return ResponseEntity.ok().build();
 			} catch (Exception e)
 			{
 				return ResponseEntity.internalServerError().build();
 			}
-		}else {
+		} else
+		{
 			return ResponseEntity.notFound().build();
 		}
 	}
-	
+
 //	API for the Quantity decrease of ordermenu
 	@PutMapping("/decreasequantity/{orderid}")
 	public ResponseEntity<HttpStatus> decreaseQuantityOfItem(@PathVariable("orderid") int orderid)
 	{
 		Optional<Order_menus> findById = orderMenusRepository.findById(orderid);
-		if(findById.isPresent())
+		if (findById.isPresent())
 		{
 			try
 			{
 				Order_menus order_menus = findById.get();
-				
+
 				int quantity = order_menus.getQuantity();
-				if(quantity == 1 ) {
+				if (quantity == 1)
+				{
 					orderMenusRepository.deleteById(orderid);
 					return ResponseEntity.ok().build();
-				}else {
+				} else
+				{
 					Menu menu = order_menus.getMenus();
 					int Qt = quantity - 1;
 					order_menus.setQuantity(Qt);
 					int discountedPriceOnOneQT = menu.getPrice() - (menu.getPrice() * menu.getDiscount() / 100);
 					order_menus.setTotalprice(Qt * discountedPriceOnOneQT);
 					orderMenusRepository.save(order_menus);
-					
+
 					return ResponseEntity.ok().build();
 				}
 			} catch (Exception e)
 			{
 				return ResponseEntity.internalServerError().build();
 			}
-		}else {
+		} else
+		{
 			return ResponseEntity.notFound().build();
 		}
 	}
-//	g
+
 //	get the final price of the particular table with status
 	@GetMapping("/getfinalprice/{restid}/{tableid}/{status}")
-	public ResponseEntity<Integer> getTotalPriceofTable(
-	    @PathVariable("restid") int restid,
-	    @PathVariable("tableid") int tableid,
-	    @PathVariable("status") int status
-	) {
-	    List<Order_menus> orderMenusList = orderMenusRepository.findByTables_IdAndResturant_IdAndStatus(tableid, restid, status);
+	public ResponseEntity<Integer> getTotalPriceofTable(@PathVariable("restid") int restid,
+			@PathVariable("tableid") int tableid, @PathVariable("status") int status)
+	{
+		List<Order_menus> orderMenusList = orderMenusRepository.findByTables_IdAndResturant_IdAndStatus(tableid, restid,
+				status);
 
-	    if (!orderMenusList.isEmpty()) {
-	        try {
-	            int finalbillprice = 0;
+		if (!orderMenusList.isEmpty())
+		{
+			try
+			{
+				int finalbillprice = 0;
 
-	            for (Order_menus orderMenus : orderMenusList) {
-	                int price = orderMenus.getTotalprice();
-	                finalbillprice += price;
-	            }
+				for (Order_menus orderMenus : orderMenusList)
+				{
+					int price = orderMenus.getTotalprice();
+					finalbillprice += price;
+				}
 
-	            return ResponseEntity.ok(finalbillprice);
-	        } catch (Exception e) {
-	        	
-	            return ResponseEntity.internalServerError().build();
-	        }
-	    } else {
-	        return ResponseEntity.notFound().build();
-	    }
-	    
+				return ResponseEntity.ok(finalbillprice);
+			} catch (Exception e)
+			{
+
+				return ResponseEntity.internalServerError().build();
+			}
+		} else
+		{
+			return ResponseEntity.notFound().build();
+		}
+
+	}
+
+//	make the status one to two (1 -> 2)
+	@PutMapping("/status/changestatustotwor/{restid}/{tableid}")
+	public ResponseEntity<HttpStatus> changeStatusonetToTwo(@PathVariable("restid") int restid,
+			@PathVariable("tableid") int tableid)
+	{
+		List<Order_menus> orderMenusList = orderMenusRepository.findByTables_IdAndResturant_IdAndStatus(tableid, restid, 1);
+
+		if (!orderMenusList.isEmpty())
+		{
+			try
+			{
+				for(Order_menus order_menus: orderMenusList)
+				{
+					order_menus.setStatus(2);
+					orderMenusRepository.save(order_menus);
+				}
+				return ResponseEntity.ok().build();
+			} catch (Exception e)
+			{
+				return ResponseEntity.internalServerError().build();
+			}
+		} else
+		{
+			return ResponseEntity.notFound().build();
+		}
 	}
 
 }
