@@ -117,19 +117,18 @@ public class MenuController
 		{
 			if (vegornonveg.equals("veg"))
 			{
-				Optional<List<Menu>> findByIsveg = menuRepos.findByIsveg(true);
+				Optional<List<Menu>> findByIsveg = menuRepos.findByIsvegAndResturant_id(true,restid);
 
 				return ResponseEntity.ok(findByIsveg);
 
 //				return ResponseEntity.status(200).build();
 			} else if (vegornonveg.equals("nonveg"))
 			{
-				Optional<List<Menu>> findByIsveg = menuRepos.findByIsveg(false);
+				Optional<List<Menu>> findByIsveg = menuRepos.findByIsvegAndResturant_id(false,restid);
 
 				return ResponseEntity.ok(findByIsveg);
 			} else
 			{
-
 				return ResponseEntity.notFound().build();
 			}
 		} else
