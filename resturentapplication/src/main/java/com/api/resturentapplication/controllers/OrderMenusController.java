@@ -218,7 +218,7 @@ public class OrderMenusController
 		}
 	}
 	
-//	get the final price of the perticular table with status
+//	get the final price of the particular table with status
 	@GetMapping("/getfinalprice/{restid}/{tableid}/{status}")
 	public ResponseEntity<Integer> getTotalPriceofTable(
 	    @PathVariable("restid") int restid,
