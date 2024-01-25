@@ -42,6 +42,8 @@ public class Order_menus
 	private int quantity;
 	
 	private int totalprice;
+	
+//	private 
 
 	
 

@@ -1,7 +1,11 @@
 package com.api.resturentapplication.controllers;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,12 +93,10 @@ public class MenuController
 		}
 	}
 
+//	get all menus of the particular restaurant with menu order
 	@GetMapping("/getallmenus/{restid}")
 	public ResponseEntity<Optional<List<Menu>>> getMenusOfRestaurant(@PathVariable("restid") int restid)
 	{
-
-//		List<Menu> findByResturant_id = menuRepos.findByResturant_id(restid);
-//		return ResponseEntity.ok(findByResturant_id);
 
 		Optional<List<Menu>> optionalfindByResturant_id = menuRepos.findByResturant_id(restid);
 		if (optionalfindByResturant_id.isPresent())
@@ -106,6 +108,7 @@ public class MenuController
 		}
 	}
 
+//	get all menus of the restaurant by veg or nonveg
 	@GetMapping("/getmenus/vegornonveg/{restid}/{vegornonveg}")
 	public ResponseEntity<Optional<List<Menu>>> getMenusWithVegorNonveg(@PathVariable("restid") int restid,
 			@PathVariable("vegornonveg") String vegornonveg)
@@ -117,14 +120,14 @@ public class MenuController
 		{
 			if (vegornonveg.equals("veg"))
 			{
-				Optional<List<Menu>> findByIsveg = menuRepos.findByIsvegAndResturant_id(true,restid);
+				Optional<List<Menu>> findByIsveg = menuRepos.findByIsvegAndResturant_id(true, restid);
 
 				return ResponseEntity.ok(findByIsveg);
 
 //				return ResponseEntity.status(200).build();
 			} else if (vegornonveg.equals("nonveg"))
 			{
-				Optional<List<Menu>> findByIsveg = menuRepos.findByIsvegAndResturant_id(false,restid);
+				Optional<List<Menu>> findByIsveg = menuRepos.findByIsvegAndResturant_id(false, restid);
 
 				return ResponseEntity.ok(findByIsveg);
 			} else
@@ -192,6 +195,50 @@ public class MenuController
 			Optional<List<Menu>> findByResturant_idAndFoodtypeAndIsveg = menuRepos
 					.findByResturant_idAndFoodtypeAndIsveg(restid, foodtype, isveg);
 			return ResponseEntity.ok(findByResturant_idAndFoodtypeAndIsveg);
+		} else
+		{
+			return ResponseEntity.notFound().build();
+		}
+	}
+
+//	get all only menus of the particular  restaurant 
+	@GetMapping("/getmenus/getallonlymenus/{restid}")
+	public ResponseEntity<List<Map<String, Object>>> getallmenusofperticularRestaurant(@PathVariable("restid") int restid)
+	{
+		Optional<List<Menu>> findByResturant_id = menuRepos.findByResturant_id(restid);
+
+		if (findByResturant_id.isPresent())
+		{
+			try
+			{
+				List<Menu> menuList = findByResturant_id.get();
+				
+				List<Map<String, Object>> responseList = new ArrayList<>();
+				
+				for (Menu menu : menuList)
+				{
+					Map<String, Object> menuMap = new HashMap<>();
+					menuMap.put("id", menu.getId());
+					menuMap.put("calories", menu.getCalories());
+					menuMap.put("carbs", menu.getCarbs());
+					menuMap.put("discount", menu.getDiscount());
+					menuMap.put("fooddetails", menu.getFooddetails());
+					menuMap.put("foodtype", menu.getFoodtype());
+					menuMap.put("ispopular", menu.getIspopular());
+					menuMap.put("isveg", menu.getIsveg());
+					menuMap.put("price", menu.getPrice());
+					menuMap.put("name", menu.getName());
+					menuMap.put("proteins", menu.getProteins());
+					menuMap.put("foodimg", menu.getFoodimg());
+					responseList.add(menuMap);
+				}
+				
+				return ResponseEntity.ok().body(responseList);
+			} catch (Exception e)
+			{
+				return ResponseEntity.internalServerError().build();
+			}
+
 		} else
 		{
 			return ResponseEntity.notFound().build();
