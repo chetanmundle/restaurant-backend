@@ -145,14 +145,28 @@ public class MenuController
 	}
 
 //	 Get on menu by Id
-	@GetMapping("/getmenu/{menuid}")
-	public ResponseEntity<Optional<Menu>> getMenuById(@PathVariable("menuid") int menuid)
+	@GetMapping("/getmenu/{restid}/{menuid}")
+	public ResponseEntity<Map<String, Object>> getMenuById(@PathVariable("restid")int restid,@PathVariable("menuid") int menuid)
 	{
-		Optional<Menu> findById = menuRepos.findById(menuid);
+		Optional<Menu> findById = menuRepos.findByIdAndResturant_id(restid,menuid);
 
 		if (findById.isPresent())
 		{
-			return ResponseEntity.ok(findById);
+			Menu menu = findById.get();
+			Map<String, Object> menuMap = new HashMap<>();
+			menuMap.put("id", menu.getId());
+			menuMap.put("calories", menu.getCalories());
+			menuMap.put("carbs", menu.getCarbs());
+			menuMap.put("discount", menu.getDiscount());
+			menuMap.put("fooddetails", menu.getFooddetails());
+			menuMap.put("foodtype", menu.getFoodtype());
+			menuMap.put("ispopular", menu.getIspopular());
+			menuMap.put("isveg", menu.getIsveg());
+			menuMap.put("price", menu.getPrice());
+			menuMap.put("name", menu.getName());
+			menuMap.put("proteins", menu.getProteins());
+			menuMap.put("foodimg", menu.getFoodimg());
+			return ResponseEntity.ok(menuMap);
 		} else
 		{
 			return ResponseEntity.notFound().build();
