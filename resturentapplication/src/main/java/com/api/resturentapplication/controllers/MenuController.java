@@ -148,7 +148,7 @@ public class MenuController
 	@GetMapping("/getmenu/{restid}/{menuid}")
 	public ResponseEntity<Map<String, Object>> getMenuById(@PathVariable("restid")int restid,@PathVariable("menuid") int menuid)
 	{
-		Optional<Menu> findById = menuRepos.findByIdAndResturant_id(restid,menuid);
+		Optional<Menu> findById = menuRepos.findByIdAndResturant_id(menuid,restid);
 
 		if (findById.isPresent())
 		{
