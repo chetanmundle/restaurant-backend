@@ -91,10 +91,47 @@ public class MenuController
 		} else
 		{
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Restaurant not found");
-//			return ResponseEntity.notFound().build();
-//			return ResponseEntity.status(404).build();
 		}
 	}
+	
+//	update menu api 
+//	@PutMapping("/updatemenu/{restid}/{menuid}")
+//	public ResponseEntity<HttpStatus> updatemenu(@PathVariable("restid") int restid,@PathVariable("menuid") int menuid, 
+//			@RequestParam(name = "name",required = false) String name,
+//			@RequestParam(name = "foodimg", required = false) MultipartFile foodimg,
+//			@RequestParam(name = "isveg", required = false) boolean isveg,
+//			@RequestParam(name = "discount", defaultValue = "0") int discount,
+//			@RequestParam(name = "foodtype", required = false) String foodtype,
+//			@RequestParam(name = "ispopular", required = false) boolean ispopular,
+//			@RequestParam(name = "carbs", required = false, defaultValue = "0") int carbs,
+//			@RequestParam(name = "proteins", required = false, defaultValue = "0") int proteins,
+//			@RequestParam(name = "calories", required = false,defaultValue = "0") int calories,
+//			@RequestParam(name = "fooddetails", required = false,defaultValue = "0") String fooddetails, 
+//			@RequestParam(name = "price", required = false,defaultValue = "0") int price)
+//	{
+//		Optional<Menu> findByIdAndResturant_id = menuRepos.findByIdAndResturant_id(menuid, restid);
+//		if(findByIdAndResturant_id.isPresent())
+//		{
+//			Menu menu = findByIdAndResturant_id.get();
+//			
+//			if (name != null)
+//			{
+//				menu.setName(name);
+////				menu.setDiscount(33);
+//				System.out.println("Name is not null");
+//			}else {
+//				System.out.println("Name is null");
+//			}
+//			 return ResponseEntity.ok().build();
+//		}else {
+//			return ResponseEntity.notFound().build();
+//		}
+//	}
+	
+	
+	
+	
+	
 
 //	get all menus of the particular restaurant with menu order
 	@GetMapping("/getallmenus/{restid}")
@@ -267,7 +304,6 @@ public class MenuController
 	@Transactional
 	public ResponseEntity<HttpStatus> deletemenuById(@PathVariable("restid") int restid,@PathVariable("menuid")int menuid)
 	{
-		
 		try
 		{
 			 menuRepos.deleteByIdAndResturant_id(menuid, restid);
@@ -277,8 +313,6 @@ public class MenuController
 			 e.printStackTrace();
 			return ResponseEntity.notFound().build();
 		}
-		
-		
 	}
 
 }

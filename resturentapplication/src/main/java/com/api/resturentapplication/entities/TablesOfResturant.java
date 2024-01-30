@@ -25,25 +25,28 @@ public class TablesOfResturant
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 
-
-
 	@ManyToOne
 	@JsonIgnore
 	private Resturant resturant;
-	
-	
 
-//	@OneToOne
-//	private Order_menus order_menus;
+	private String cname;
+
+	private long cphone;
+
+	private int status;
 
 	@OneToMany(mappedBy = "tables", cascade = CascadeType.ALL)
 	List<Order_menus> order_menus = new ArrayList<>();
 
-	public TablesOfResturant(int id, int tableid, Resturant resturant, List<Order_menus> order_menus)
+	public TablesOfResturant(int id, Resturant resturant, String cname, long cphone, int status,
+			List<Order_menus> order_menus)
 	{
 		super();
 		this.id = id;
 		this.resturant = resturant;
+		this.cname = cname;
+		this.cphone = cphone;
+		this.status = status;
 		this.order_menus = order_menus;
 	}
 
@@ -61,7 +64,6 @@ public class TablesOfResturant
 	{
 		this.id = id;
 	}
-
 
 	public Resturant getResturant()
 	{
@@ -83,11 +85,40 @@ public class TablesOfResturant
 		this.order_menus = order_menus;
 	}
 
+	public String getCname()
+	{
+		return cname;
+	}
+
+	public void setCname(String cname)
+	{
+		this.cname = cname;
+	}
+
+	public long getCphone()
+	{
+		return cphone;
+	}
+
+	public void setCphone(long cphone)
+	{
+		this.cphone = cphone;
+	}
+
+	public int getStatus()
+	{
+		return status;
+	}
+
+	public void setStatus(int status)
+	{
+		this.status = status;
+	}
+
 	@Override
 	public String toString()
 	{
-		return "TablesOfResturant [id=" + id +   ", resturant=" + resturant + ", order_menus="
-				+ order_menus + "]";
+		return "TablesOfResturant [id=" + id + ", resturant=" + resturant + ", order_menus=" + order_menus + "]";
 	}
 
 }

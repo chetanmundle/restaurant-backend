@@ -94,6 +94,7 @@ public class OrderMenusController
 
 	}
 
+//	Get table menus by status
 	@GetMapping("/findmenusoftable/{restid}/{tableid}/{status}")
 	public ResponseEntity<List<Map<String, Object>>> findByTableAndRest(@PathVariable("tableid") int tableid,
 			@PathVariable("restid") int restid, @PathVariable("status") int status)
@@ -139,6 +140,44 @@ public class OrderMenusController
 					orderMap.put("fooddetails", menu.getFooddetails());
 
 					orderMap.put("foodimg", menu.getFoodimg());
+
+					responseList.add(orderMap);
+				}
+
+				return ResponseEntity.ok().body(responseList);
+			} catch (Exception e)
+			{
+				return ResponseEntity.internalServerError().build();
+			}
+		} else
+		{
+			return ResponseEntity.notFound().build();
+		}
+	}
+
+//	Get table menus by status
+	@GetMapping("/findidsofcartitem/{restid}/{tableid}/{status}")
+	@CrossOrigin(origins = "https://resturant-application-one.vercel.app")
+	public ResponseEntity<List<Map<String, Object>>> getidofcartitem(@PathVariable("tableid") int tableid,
+			@PathVariable("restid") int restid, @PathVariable("status") int status)
+	{
+		List<Order_menus> orderMenusList = orderMenusRepository.findByTables_IdAndResturant_IdAndStatus(tableid, restid,
+				status);
+
+		if (!orderMenusList.isEmpty())
+		{
+			try
+			{
+				List<Map<String, Object>> responseList = new ArrayList<>();
+
+				for (Order_menus orderMenus : orderMenusList)
+				{
+
+					Map<String, Object> orderMap = new HashMap<>();
+
+					// Include menu details
+					Menu menu = orderMenus.getMenus();
+					orderMap.put("id", menu.getId());
 
 					responseList.add(orderMap);
 				}
@@ -258,15 +297,44 @@ public class OrderMenusController
 	public ResponseEntity<HttpStatus> changeStatusonetToTwo(@PathVariable("restid") int restid,
 			@PathVariable("tableid") int tableid)
 	{
-		List<Order_menus> orderMenusList = orderMenusRepository.findByTables_IdAndResturant_IdAndStatus(tableid, restid, 1);
+		List<Order_menus> orderMenusList = orderMenusRepository.findByTables_IdAndResturant_IdAndStatus(tableid, restid,
+				1);
 
 		if (!orderMenusList.isEmpty())
 		{
 			try
 			{
-				for(Order_menus order_menus: orderMenusList)
+				for (Order_menus order_menus : orderMenusList)
 				{
 					order_menus.setStatus(2);
+					orderMenusRepository.save(order_menus);
+				}
+				return ResponseEntity.ok().build();
+			} catch (Exception e)
+			{
+				return ResponseEntity.internalServerError().build();
+			}
+		} else
+		{
+			return ResponseEntity.notFound().build();
+		}
+	}
+
+//	make the status one to two (1 -> 2)
+	@PutMapping("/status/changestatustothree/{restid}/{tableid}")
+	public ResponseEntity<HttpStatus> changeStatusTwotoThree(@PathVariable("restid") int restid,
+			@PathVariable("tableid") int tableid)
+	{
+		List<Order_menus> orderMenusList = orderMenusRepository.findByTables_IdAndResturant_IdAndStatus(tableid, restid,
+				2);
+
+		if (!orderMenusList.isEmpty())
+		{
+			try
+			{
+				for (Order_menus order_menus : orderMenusList)
+				{
+					order_menus.setStatus(3);
 					orderMenusRepository.save(order_menus);
 				}
 				return ResponseEntity.ok().build();
