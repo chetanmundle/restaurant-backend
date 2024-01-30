@@ -32,7 +32,7 @@ import com.api.resturentapplication.entities.TablesOfResturant;
 
 @RestController
 @RequestMapping("/ordermenus")
-@CrossOrigin
+@CrossOrigin(origins = "*")
 public class OrderMenusController
 {
 	@Autowired
@@ -157,7 +157,8 @@ public class OrderMenusController
 
 //	Get table menus by status
 	@GetMapping("/findidsofcartitem/{restid}/{tableid}/{status}")
-	@CrossOrigin(origins = "https://resturant-application-one.vercel.app")
+//	@CrossOrigin(origins = "https://resturant-application-one.vercel.app")
+//	@CrossOrigin(origins = "*")
 	public ResponseEntity<List<Map<String, Object>>> getidofcartitem(@PathVariable("tableid") int tableid,
 			@PathVariable("restid") int restid, @PathVariable("status") int status)
 	{

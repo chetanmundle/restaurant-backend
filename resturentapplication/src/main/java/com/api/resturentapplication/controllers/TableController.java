@@ -21,7 +21,7 @@ import com.api.resturentapplication.entities.TablesOfResturant;
 
 @RestController
 @RequestMapping("/tablesofrestaurant")
-@CrossOrigin
+@CrossOrigin(origins = "*")
 public class TableController
 {
 	@Autowired

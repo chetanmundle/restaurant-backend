@@ -21,7 +21,7 @@ import com.api.resturentapplication.entities.Resturant;
 
 @RestController
 @RequestMapping("/restaurant")
-@CrossOrigin
+@CrossOrigin(origins = "*")
 public class ResturantController
 {
 
