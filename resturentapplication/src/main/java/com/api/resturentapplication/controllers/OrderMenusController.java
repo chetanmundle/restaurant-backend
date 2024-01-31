@@ -293,7 +293,7 @@ public class OrderMenusController
 
 	}
 
-//	make the status one to two (1 -> 2)
+//	make the status one to two (1 -> 2) of menu and update table to booked
 	@PutMapping("/status/changestatustotwo/{restid}/{tableid}")
 	public ResponseEntity<HttpStatus> changeStatusonetToTwo(@PathVariable("restid") int restid,
 			@PathVariable("tableid") int tableid, @RequestBody TablesOfResturant tablesOfResturant1)
@@ -338,6 +338,7 @@ public class OrderMenusController
 			}else if (status == 1) {
 				if(tablesOfResturant.getCphone() == tablesOfResturant1.getCphone())
 				{
+					System.out.println("Same number");
 					List<Order_menus> orderMenusList = orderMenusRepository.findByTables_IdAndResturant_IdAndStatus(tableid,
 							restid, 1);
 

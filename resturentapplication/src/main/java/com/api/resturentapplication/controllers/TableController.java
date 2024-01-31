@@ -1,6 +1,9 @@
 package com.api.resturentapplication.controllers;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,24 +64,40 @@ public class TableController
 			return ResponseEntity.notFound().build();
 		}
 	}
+
 	
-//	update the status zero(empty) to one(Booked)
-	@PutMapping("/updatestatuszerotoone/withcustomer/{restid}/{tableid}")
-	public ResponseEntity<HttpStatus> updateStatusandcustomer(@RequestBody TablesOfResturant tablesOfResturant)
+	
+	@GetMapping("/gettableswithstatus/{restid}")
+	public ResponseEntity<List<Map<String, Object>>> getalltableswithstatus(@PathVariable("restid")int restid)
 	{
-		System.out.println("Tableid "+tablesOfResturant.getId());
-		System.out.println("Restid : "+tablesOfResturant.getResturant());
+		Optional<List<TablesOfResturant>> findByResturant_id = tableofResturentRepository.findByResturant_id(restid);
 		
-		return ResponseEntity.ok().build();
-//		Optional<TablesOfResturant> findByIdAndResturant_id = tableofResturentRepository.findByIdAndResturant_id(tablesOfResturant.getId(), tablesOfResturant.getResturant());
-//		
-//		if(findByIdAndResturant_id.isPresent())
-//		{
-//			TablesOfResturant tablesOfResturant = findByIdAndResturant_id.get();
-//			tablesOfResturant.setCname(null)
-//		}else {
-//			return ResponseEntity.notFound().build();
-//		}
+		if(findByResturant_id.isPresent())
+		{
+			try
+			{
+				List<TablesOfResturant> tablesOfResturantList = findByResturant_id.get();
+				
+				List<Map<String, Object>> responseList = new ArrayList<>();
+				
+				for(TablesOfResturant tablesOfResturant : tablesOfResturantList)
+				{
+					Map<String, Object> tableMap = new HashMap<>();
+					tableMap.put("id", tablesOfResturant.getId());
+					tableMap.put("status", tablesOfResturant.getStatus());
+					responseList.add(tableMap);
+				}
+				
+				return ResponseEntity.ok().body(responseList);
+				
+			} catch (Exception e)
+			{
+				return ResponseEntity.internalServerError().build();
+			}
+			
+		}else {
+			return ResponseEntity.notFound().build();
+		}
 	}
 	
 	
