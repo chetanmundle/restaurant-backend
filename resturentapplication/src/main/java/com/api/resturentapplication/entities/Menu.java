@@ -50,9 +50,8 @@ public class Menu
 
 	private String fooddetails;
 
-	@Lob
-	@Column(length = 1048576)
-	private byte[] foodimg;
+	
+	private String foodimg;
 
 	@OneToMany(mappedBy = "menus", cascade = CascadeType.ALL)
 	List<Order_menus> order_menus = new ArrayList<>();
@@ -60,7 +59,7 @@ public class Menu
 	
 
 	public Menu(int id, Resturant resturant, String name, boolean isveg, int discount, String foodtype,
-			boolean ispopular, int carbs, int proteins, int calories, int price, String fooddetails, byte[] foodimg,
+			boolean ispopular, int carbs, int proteins, int calories, int price, String fooddetails, String foodimg,
 			List<Order_menus> order_menus)
 	{
 		super();
@@ -199,12 +198,14 @@ public class Menu
 		this.fooddetails = fooddetails;
 	}
 
-	public byte[] getFoodimg()
+	
+
+	public String getFoodimg()
 	{
 		return foodimg;
 	}
 
-	public void setFoodimg(byte[] foodimg)
+	public void setFoodimg(String foodimg)
 	{
 		this.foodimg = foodimg;
 	}

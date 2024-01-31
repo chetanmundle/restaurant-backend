@@ -44,7 +44,7 @@ public class MenuController
 //	Api for save particular menu
 	@PostMapping("/savemenu/{restid}")
 	public ResponseEntity<String> saveMenus(@PathVariable("restid") int restid, @RequestParam("name") String name,
-			@RequestParam(name = "foodimg", required = false) MultipartFile foodimg,
+			@RequestParam(name = "foodimg", required = false, defaultValue = "") String foodimg,
 			@RequestParam("isveg") boolean isveg,
 			@RequestParam(name = "discount", required = false, defaultValue = "0") int discount,
 			@RequestParam(name = "foodtype", required = false, defaultValue = "") String foodtype,
@@ -67,7 +67,7 @@ public class MenuController
 				menu.setResturant(resturant); // Set the rest field in Menu entity
 
 				menu.setName(name);
-				menu.setFoodimg(foodimg.getBytes());
+				menu.setFoodimg(foodimg);
 				menu.setIsveg(isveg);
 				menu.setDiscount(discount);
 				menu.setPrice(price);
@@ -80,14 +80,15 @@ public class MenuController
 				menuRepos.save(menu);
 //				return ResponseEntity.status(HttpStatus.OK).build();
 				return ResponseEntity.ok("Menu Saved");
-			} catch (IOException e)
+			} catch (Exception e)
 			{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 
 				return ResponseEntity.internalServerError().body("Internal Server Error");
 			}
-
+			
+			
 		} else
 		{
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Restaurant not found");
