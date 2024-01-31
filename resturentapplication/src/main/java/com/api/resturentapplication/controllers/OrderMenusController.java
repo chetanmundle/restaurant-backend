@@ -294,34 +294,89 @@ public class OrderMenusController
 	}
 
 //	make the status one to two (1 -> 2)
-	@PutMapping("/status/changestatustotwor/{restid}/{tableid}")
+	@PutMapping("/status/changestatustotwo/{restid}/{tableid}")
 	public ResponseEntity<HttpStatus> changeStatusonetToTwo(@PathVariable("restid") int restid,
-			@PathVariable("tableid") int tableid)
+			@PathVariable("tableid") int tableid, @RequestBody TablesOfResturant tablesOfResturant1)
 	{
-		List<Order_menus> orderMenusList = orderMenusRepository.findByTables_IdAndResturant_IdAndStatus(tableid, restid,
-				1);
+		Optional<TablesOfResturant> findByIdAndResturant_id = tableofResturentRepository
+				.findByIdAndResturant_id(tableid, restid);
 
-		if (!orderMenusList.isEmpty())
+		if (findByIdAndResturant_id.isPresent())
 		{
-			try
+			TablesOfResturant tablesOfResturant = findByIdAndResturant_id.get();
+			int status = tablesOfResturant.getStatus();
+			if (status == 0)
 			{
-				for (Order_menus order_menus : orderMenusList)
+				List<Order_menus> orderMenusList = orderMenusRepository.findByTables_IdAndResturant_IdAndStatus(tableid,
+						restid, 1);
+
+				if (!orderMenusList.isEmpty())
 				{
-					order_menus.setStatus(2);
-					orderMenusRepository.save(order_menus);
+					try
+					{
+
+						tablesOfResturant.setCname(tablesOfResturant1.getCname());
+						tablesOfResturant.setCphone(tablesOfResturant1.getCphone());
+						tablesOfResturant.setStatus(1);
+						tableofResturentRepository.save(tablesOfResturant);
+
+						for (Order_menus order_menus : orderMenusList)
+						{
+							order_menus.setStatus(2);
+							orderMenusRepository.save(order_menus);
+						}
+						return ResponseEntity.ok().build();
+					} catch (Exception e)
+					{
+						return ResponseEntity.internalServerError().build();
+					}
+				}else
+				{
+//					System.out.println();
+					return ResponseEntity.notFound().build();
 				}
-				return ResponseEntity.ok().build();
-			} catch (Exception e)
+			}else if (status == 1) {
+				if(tablesOfResturant.getCphone() == tablesOfResturant1.getCphone())
+				{
+					List<Order_menus> orderMenusList = orderMenusRepository.findByTables_IdAndResturant_IdAndStatus(tableid,
+							restid, 1);
+
+					if (!orderMenusList.isEmpty())
+					{
+						try
+						{
+							for (Order_menus order_menus : orderMenusList)
+							{
+								order_menus.setStatus(2);
+								orderMenusRepository.save(order_menus);
+							}
+							return ResponseEntity.ok().build();
+						} catch (Exception e)
+						{
+							return ResponseEntity.internalServerError().build();
+						}
+					}else
+					{
+//						System.out.println();
+						return ResponseEntity.notFound().build();
+					}
+				}else {
+//					anather user is logged in means table is booked
+					return ResponseEntity.status(409).build();
+				}
+			} else
 			{
-				return ResponseEntity.internalServerError().build();
+				return ResponseEntity.status(409).build();
 			}
 		} else
 		{
+			System.out.println("Restaurant not found");
 			return ResponseEntity.notFound().build();
 		}
+
 	}
 
-//	make the status one to two (1 -> 2)
+//	make the status one to two (2 -> 3)
 	@PutMapping("/status/changestatustothree/{restid}/{tableid}")
 	public ResponseEntity<HttpStatus> changeStatusTwotoThree(@PathVariable("restid") int restid,
 			@PathVariable("tableid") int tableid)
