@@ -50,54 +50,53 @@ public class OrderMenusController
 //	@Autowired
 //	private Order_menus order_menus;
 
-//	api for add to cart
-	@PostMapping("/addtocart/{restid}/{tableid}/{menuid}")
-	private ResponseEntity<Order_menus> addtocartitem(@PathVariable("restid") int restid,
-			@PathVariable("tableid") int tableid, @PathVariable("menuid") int menuid)
-	{
-
-		Optional<Resturant> optionalResturant = restRepos.findById(restid);
-		Optional<Menu> optionalfindByIdAndResturant_id = menuRepos.findByIdAndResturant_id(menuid, restid);
-		Optional<TablesOfResturant> optionalfindByTableidAndResturant_id = tableofResturentRepository
-				.findByIdAndResturant_id(tableid, restid);
-
-		if (optionalResturant.isPresent() && optionalfindByIdAndResturant_id.isPresent()
-				&& optionalfindByTableidAndResturant_id.isPresent())
-		{
-
-			try
-			{
-				Order_menus order_menus = new Order_menus();
-				Resturant resturant = optionalResturant.get();
-				Menu menu = optionalfindByIdAndResturant_id.get();
-				TablesOfResturant tablesOfResturant = optionalfindByTableidAndResturant_id.get();
-//				System.out.println(resturant.getId() + resturant.getRest_name());
-				order_menus.setResturant(resturant);
-				order_menus.setMenus(menu);
-				order_menus.setTables(tablesOfResturant);
-				order_menus.setStatus(1);
-				order_menus.setQuantity(1);
-				int price = menu.getPrice();
-				int discount = menu.getDiscount();
-				order_menus.setTotalprice(price - (price * discount / 100));
-
-				orderMenusRepository.save(order_menus);
-				return ResponseEntity.ok().build();
-			} catch (Exception e)
-			{
-				return ResponseEntity.internalServerError().build();
-			}
-
-		} else
-		{
-			return ResponseEntity.notFound().build();
-		}
-
-	}
+////	api for add to cart
+//	@PostMapping("/addtocart/{restid}/{tableid}/{menuid}")
+//	private ResponseEntity<Order_menus> addtocartitem(@PathVariable("restid") int restid,
+//			@PathVariable("tableid") int tableid, @PathVariable("menuid") int menuid)
+//	{
+//
+//		Optional<Resturant> optionalResturant = restRepos.findById(restid);
+//		Optional<Menu> optionalfindByIdAndResturant_id = menuRepos.findByIdAndResturant_id(menuid, restid);
+//		Optional<TablesOfResturant> optionalfindByTableidAndResturant_id = tableofResturentRepository
+//				.findByIdAndResturant_id(tableid, restid);
+//
+//		if (optionalResturant.isPresent() && optionalfindByIdAndResturant_id.isPresent()
+//				&& optionalfindByTableidAndResturant_id.isPresent())
+//		{
+//
+//			try
+//			{
+//				Order_menus order_menus = new Order_menus();
+//				Resturant resturant = optionalResturant.get();
+//				Menu menu = optionalfindByIdAndResturant_id.get();
+//				TablesOfResturant tablesOfResturant = optionalfindByTableidAndResturant_id.get();
+////				System.out.println(resturant.getId() + resturant.getRest_name());
+//				order_menus.setResturant(resturant);
+//				order_menus.setMenus(menu);
+//				order_menus.setTables(tablesOfResturant);
+//				order_menus.setStatus(1);
+//				order_menus.setQuantity(1);
+//				int price = menu.getPrice();
+//				int discount = menu.getDiscount();
+//				order_menus.setTotalprice(price - (price * discount / 100));
+//
+//				orderMenusRepository.save(order_menus);
+//				return ResponseEntity.ok().build();
+//			} catch (Exception e)
+//			{
+//				return ResponseEntity.internalServerError().build();
+//			}
+//
+//		} else
+//		{
+//			return ResponseEntity.notFound().build();
+//		}
+//
+//	}
 	
 	
-//	test api
-	
+//	API for add to cart item
 	@PostMapping("/addtocart")
 	public ResponseEntity<String> testapi(@RequestBody Map<String, Object> requestbodyMap)
 	{
@@ -244,8 +243,6 @@ public class OrderMenusController
 
 //	Get table menus by status
 	@GetMapping("/findidsofcartitem/{restid}/{tableid}/{status}")
-//	@CrossOrigin(origins = "https://resturant-application-one.vercel.app")
-//	@CrossOrigin(origins = "*")
 	public ResponseEntity<List<Map<String, Object>>> getidofcartitem(@PathVariable("tableid") int tableid,
 			@PathVariable("restid") int restid, @PathVariable("status") int status)
 	{
@@ -280,6 +277,70 @@ public class OrderMenusController
 			return ResponseEntity.notFound().build();
 		}
 	}
+	
+//	test for up
+	@GetMapping("/findidsofcartitem")
+	public ResponseEntity<List<Map<String,Object>>> getidsofCartitem(@RequestBody Map<String, Object> requestbodyMap)
+	{
+		Object restidobj = requestbodyMap.get("restid");
+		Object tableidobj = requestbodyMap.get("tableid");
+		int status = (int) requestbodyMap.get("status");
+		Object cphoneStringobj = requestbodyMap.get("cphone");
+		
+		int restid = Integer.parseInt((String) restidobj);
+		int tableid = Integer.parseInt((String) tableidobj);
+		long cphone = Long.parseLong((String) cphoneStringobj);
+		
+		List<Order_menus> orderMenusList = orderMenusRepository.findByTables_IdAndResturant_IdAndStatusAndCphone(tableid, restid,
+				status,cphone);
+
+		if (!orderMenusList.isEmpty())
+		{
+			try
+			{
+				List<Map<String, Object>> responseList = new ArrayList<>();
+
+				for (Order_menus orderMenus : orderMenusList)
+				{
+
+					Map<String, Object> orderMap = new HashMap<>();
+
+					// Include menu details
+					Menu menu = orderMenus.getMenus();
+					orderMap.put("id", menu.getId());
+
+					responseList.add(orderMap);
+				}
+
+				return ResponseEntity.ok().body(responseList);
+			} catch (Exception e)
+			{
+				return ResponseEntity.internalServerError().build();
+			}
+		} else
+		{
+			return ResponseEntity.notFound().build();
+		}
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 
 //	API for increase Quantity of ordermenu
 	@PutMapping("/increasequantity/{orderid}")

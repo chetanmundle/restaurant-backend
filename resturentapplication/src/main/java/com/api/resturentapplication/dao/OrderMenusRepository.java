@@ -13,4 +13,6 @@ public interface OrderMenusRepository extends JpaRepository<Order_menus, Integer
 	Optional<List<Order_menus>> findByTables_id(int tableid);
 
 	List<Order_menus> findByTables_IdAndResturant_IdAndStatus(int tableid, int restid,int status);
+	
+	List<Order_menus> findByTables_IdAndResturant_IdAndStatusAndCphone(int tableid, int restid,int status,long cphone);
 }
