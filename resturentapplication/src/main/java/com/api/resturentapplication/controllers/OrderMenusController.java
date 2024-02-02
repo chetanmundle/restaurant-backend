@@ -50,6 +50,7 @@ public class OrderMenusController
 //	@Autowired
 //	private Order_menus order_menus;
 
+//	api for add to cart
 	@PostMapping("/addtocart/{restid}/{tableid}/{menuid}")
 	private ResponseEntity<Order_menus> addtocartitem(@PathVariable("restid") int restid,
 			@PathVariable("tableid") int tableid, @PathVariable("menuid") int menuid)
@@ -93,6 +94,77 @@ public class OrderMenusController
 		}
 
 	}
+	
+	
+//	test api
+	
+	@PostMapping("/addtocart")
+	public ResponseEntity<String> testapi(@RequestBody Map<String, Object> requestbodyMap)
+	{
+		int restid = (int) requestbodyMap.get("restid");
+		int tableid = (int) requestbodyMap.get("tableid");
+		int menuid = (int) requestbodyMap.get("menuid");
+		long cphone = (long) requestbodyMap.get("cphone");
+		
+		
+		Optional<TablesOfResturant> optionalfindByTableidAndResturant_id = tableofResturentRepository
+				.findByIdAndResturant_id(tableid, restid);
+		
+		if(optionalfindByTableidAndResturant_id.isPresent())
+		{
+			TablesOfResturant tablesOfResturant = optionalfindByTableidAndResturant_id.get();
+			if(tablesOfResturant.getCphone() == 0 || tablesOfResturant.getCphone() == cphone)
+			{
+				Optional<Resturant> optionalResturant = restRepos.findById(restid);
+				Optional<Menu> optionalfindByIdAndResturant_id = menuRepos.findByIdAndResturant_id(menuid, restid);
+				
+
+				if (optionalfindByIdAndResturant_id.isPresent()
+						&& optionalResturant.isPresent())
+				{
+
+					try
+					{
+						Order_menus order_menus = new Order_menus();
+						Resturant resturant = optionalResturant.get();
+						Menu menu = optionalfindByIdAndResturant_id.get();
+						order_menus.setResturant(resturant);
+						order_menus.setMenus(menu);
+						order_menus.setTables(tablesOfResturant);
+						order_menus.setStatus(1);
+						order_menus.setQuantity(1);
+						int price = menu.getPrice();
+						int discount = menu.getDiscount();
+						order_menus.setTotalprice(price - (price * discount / 100));
+
+						orderMenusRepository.save(order_menus);
+					
+						return ResponseEntity.ok().build();
+					} catch (Exception e)
+					{
+						return ResponseEntity.internalServerError().build();
+					}
+
+				} else
+				{
+					return ResponseEntity.notFound().build();
+				}
+			}else {
+				return ResponseEntity.status(HttpStatus.CONFLICT).body("Table is already booked...");
+			}
+		}else {
+			 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Restaurant or table not found..");
+		}
+		
+	}
+	
+	
+	
+	
+	
+	
+	
+	
 
 //	Get table menus by status
 	@GetMapping("/findmenusoftable/{restid}/{tableid}/{status}")
@@ -293,9 +365,9 @@ public class OrderMenusController
 
 	}
 
-//	make the status one to two (1 -> 2) of menu and update table to booked
+//	make the status one to two (1{add in cart} -> 2{order}) of menu and update table to booked
 	@PutMapping("/status/changestatustotwo/{restid}/{tableid}")
-	public ResponseEntity<HttpStatus> changeStatusonetToTwo(@PathVariable("restid") int restid,
+	public ResponseEntity<String> changeStatusonetToTwo(@PathVariable("restid") int restid,
 			@PathVariable("tableid") int tableid, @RequestBody TablesOfResturant tablesOfResturant1)
 	{
 		Optional<TablesOfResturant> findByIdAndResturant_id = tableofResturentRepository
@@ -363,7 +435,7 @@ public class OrderMenusController
 					}
 				}else {
 //					anather user is logged in means table is booked
-					return ResponseEntity.status(409).build();
+					return ResponseEntity.status(HttpStatus.CONFLICT).body("Table is already booked...");
 				}
 			} else
 			{
