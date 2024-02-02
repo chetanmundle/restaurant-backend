@@ -101,60 +101,76 @@ public class OrderMenusController
 	@PostMapping("/addtocart")
 	public ResponseEntity<String> testapi(@RequestBody Map<String, Object> requestbodyMap)
 	{
-		int restid = (int) requestbodyMap.get("restid");
-		int tableid = (int) requestbodyMap.get("tableid");
+		Object restidobj = requestbodyMap.get("restid");
+		Object tableidobj = requestbodyMap.get("tableid");
 		int menuid = (int) requestbodyMap.get("menuid");
-		long cphone = (long) requestbodyMap.get("cphone");
+		Object cphoneStringobj = requestbodyMap.get("cphone");
+		
+		int restid = Integer.parseInt((String) restidobj);
+		int tableid = Integer.parseInt((String) tableidobj);
+//		int menuid = Integer.parseInt((String) menuidobj);
+		long cphone = Long.parseLong((String) cphoneStringobj);
 		
 		
-		Optional<TablesOfResturant> optionalfindByTableidAndResturant_id = tableofResturentRepository
-				.findByIdAndResturant_id(tableid, restid);
 		
-		if(optionalfindByTableidAndResturant_id.isPresent())
-		{
-			TablesOfResturant tablesOfResturant = optionalfindByTableidAndResturant_id.get();
-			if(tablesOfResturant.getCphone() == 0 || tablesOfResturant.getCphone() == cphone)
+
+		try {
+
+		    Optional<TablesOfResturant> optionalfindByTableidAndResturant_id = tableofResturentRepository
+					.findByIdAndResturant_id(tableid, restid);
+			
+			if(optionalfindByTableidAndResturant_id.isPresent())
 			{
-				Optional<Resturant> optionalResturant = restRepos.findById(restid);
-				Optional<Menu> optionalfindByIdAndResturant_id = menuRepos.findByIdAndResturant_id(menuid, restid);
-				
-
-				if (optionalfindByIdAndResturant_id.isPresent()
-						&& optionalResturant.isPresent())
+				TablesOfResturant tablesOfResturant = optionalfindByTableidAndResturant_id.get();
+				if(tablesOfResturant.getCphone() == 0 || tablesOfResturant.getCphone() == cphone)
 				{
-
-					try
-					{
-						Order_menus order_menus = new Order_menus();
-						Resturant resturant = optionalResturant.get();
-						Menu menu = optionalfindByIdAndResturant_id.get();
-						order_menus.setResturant(resturant);
-						order_menus.setMenus(menu);
-						order_menus.setTables(tablesOfResturant);
-						order_menus.setStatus(1);
-						order_menus.setQuantity(1);
-						int price = menu.getPrice();
-						int discount = menu.getDiscount();
-						order_menus.setTotalprice(price - (price * discount / 100));
-
-						orderMenusRepository.save(order_menus);
+					Optional<Resturant> optionalResturant = restRepos.findById(restid);
+					Optional<Menu> optionalfindByIdAndResturant_id = menuRepos.findByIdAndResturant_id(menuid, restid);
 					
-						return ResponseEntity.ok().build();
-					} catch (Exception e)
-					{
-						return ResponseEntity.internalServerError().build();
-					}
 
-				} else
-				{
-					return ResponseEntity.notFound().build();
+					if (optionalfindByIdAndResturant_id.isPresent()
+							&& optionalResturant.isPresent())
+					{
+
+						try
+						{
+							Order_menus order_menus = new Order_menus();
+							Resturant resturant = optionalResturant.get();
+							Menu menu = optionalfindByIdAndResturant_id.get();
+							order_menus.setResturant(resturant);
+							order_menus.setMenus(menu);
+							order_menus.setTables(tablesOfResturant);
+							order_menus.setStatus(1);
+							order_menus.setQuantity(1);
+							int price = menu.getPrice();
+							int discount = menu.getDiscount();
+							order_menus.setTotalprice(price - (price * discount / 100));
+
+							orderMenusRepository.save(order_menus);
+						
+							return ResponseEntity.ok().build();
+						} catch (Exception e)
+						{
+							return ResponseEntity.internalServerError().build();
+						}
+
+					} else
+					{
+						return ResponseEntity.notFound().build();
+					}
+				}else {
+					return ResponseEntity.status(HttpStatus.CONFLICT).body("Table is already booked...");
 				}
 			}else {
-				return ResponseEntity.status(HttpStatus.CONFLICT).body("Table is already booked...");
+				 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Restaurant or table not found..");
 			}
-		}else {
-			 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Restaurant or table not found..");
+		} catch (NumberFormatException e) {
+		    // Handle the case where the string cannot be parsed to a long
+		    return ResponseEntity.badRequest().body("Invalid phone number format");
 		}
+		
+		
+		
 		
 	}
 	
