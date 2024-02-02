@@ -110,9 +110,7 @@ public class OrderMenusController
 		int tableid = Integer.parseInt((String) tableidobj);
 //		int menuid = Integer.parseInt((String) menuidobj);
 		long cphone = Long.parseLong((String) cphoneStringobj);
-		
-		
-		
+
 
 		try {
 
@@ -142,6 +140,7 @@ public class OrderMenusController
 							order_menus.setTables(tablesOfResturant);
 							order_menus.setStatus(1);
 							order_menus.setQuantity(1);
+							order_menus.setCphone(cphone);
 							int price = menu.getPrice();
 							int discount = menu.getDiscount();
 							order_menus.setTotalprice(price - (price * discount / 100));
