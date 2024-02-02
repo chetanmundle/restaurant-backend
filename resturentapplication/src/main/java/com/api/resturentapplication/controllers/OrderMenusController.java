@@ -279,7 +279,7 @@ public class OrderMenusController
 	}
 	
 //	test for up
-	@GetMapping("/findidsofcartitem")
+	@PostMapping("/findidsofcartitem")
 	public ResponseEntity<List<Map<String,Object>>> getidsofCartitem(@RequestBody Map<String, Object> requestbodyMap)
 	{
 		Object restidobj = requestbodyMap.get("restid");
