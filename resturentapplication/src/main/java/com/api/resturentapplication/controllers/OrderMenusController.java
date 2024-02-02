@@ -50,51 +50,6 @@ public class OrderMenusController
 //	@Autowired
 //	private Order_menus order_menus;
 
-////	api for add to cart
-//	@PostMapping("/addtocart/{restid}/{tableid}/{menuid}")
-//	private ResponseEntity<Order_menus> addtocartitem(@PathVariable("restid") int restid,
-//			@PathVariable("tableid") int tableid, @PathVariable("menuid") int menuid)
-//	{
-//
-//		Optional<Resturant> optionalResturant = restRepos.findById(restid);
-//		Optional<Menu> optionalfindByIdAndResturant_id = menuRepos.findByIdAndResturant_id(menuid, restid);
-//		Optional<TablesOfResturant> optionalfindByTableidAndResturant_id = tableofResturentRepository
-//				.findByIdAndResturant_id(tableid, restid);
-//
-//		if (optionalResturant.isPresent() && optionalfindByIdAndResturant_id.isPresent()
-//				&& optionalfindByTableidAndResturant_id.isPresent())
-//		{
-//
-//			try
-//			{
-//				Order_menus order_menus = new Order_menus();
-//				Resturant resturant = optionalResturant.get();
-//				Menu menu = optionalfindByIdAndResturant_id.get();
-//				TablesOfResturant tablesOfResturant = optionalfindByTableidAndResturant_id.get();
-////				System.out.println(resturant.getId() + resturant.getRest_name());
-//				order_menus.setResturant(resturant);
-//				order_menus.setMenus(menu);
-//				order_menus.setTables(tablesOfResturant);
-//				order_menus.setStatus(1);
-//				order_menus.setQuantity(1);
-//				int price = menu.getPrice();
-//				int discount = menu.getDiscount();
-//				order_menus.setTotalprice(price - (price * discount / 100));
-//
-//				orderMenusRepository.save(order_menus);
-//				return ResponseEntity.ok().build();
-//			} catch (Exception e)
-//			{
-//				return ResponseEntity.internalServerError().build();
-//			}
-//
-//		} else
-//		{
-//			return ResponseEntity.notFound().build();
-//		}
-//
-//	}
-	
 	
 //	API for add to cart item
 	@PostMapping("/addtocart")
@@ -203,10 +158,71 @@ public class OrderMenusController
 					orderMap.put("quantity", orderMenus.getQuantity());
 					orderMap.put("totalprice", orderMenus.getTotalprice());
 
-					// Include restaurant details
-//		                Resturant restaurant = orderMenus.getResturant();
-//		                orderMap.put("restaurant_id", restaurant.getId());
-//		                orderMap.put("restaurant_name", restaurant.getRest_name());
+//					include table details
+					TablesOfResturant tablesOfResturant = orderMenus.getTables();
+					orderMap.put("tableid", tablesOfResturant.getId());
+
+					// Include menu details
+					Menu menu = orderMenus.getMenus();
+					orderMap.put("id", menu.getId());
+					orderMap.put("name", menu.getName());
+					orderMap.put("foodtype", menu.getFoodtype());
+					orderMap.put("isveg", menu.getIsveg());
+					orderMap.put("discount", menu.getDiscount());
+					orderMap.put("ispopular", menu.getIspopular());
+					orderMap.put("carbs", menu.getCarbs());
+					orderMap.put("proteins", menu.getProteins());
+					orderMap.put("calories", menu.getCalories());
+					orderMap.put("fooddetails", menu.getFooddetails());
+
+					orderMap.put("foodimg", menu.getFoodimg());
+
+					responseList.add(orderMap);
+				}
+
+				return ResponseEntity.ok().body(responseList);
+			} catch (Exception e)
+			{
+				return ResponseEntity.internalServerError().build();
+			}
+		} else
+		{
+			return ResponseEntity.notFound().build();
+		}
+	}
+	
+	
+//	test of up
+	@PostMapping("/findmenusoftable")
+	public ResponseEntity<List<Map<String,Object>>> findmenusoftable(@RequestBody Map<String, Object> requestbodyMap)
+	{
+		Object restidobj = requestbodyMap.get("restid");
+		Object tableidobj = requestbodyMap.get("tableid");
+		int status = (int) requestbodyMap.get("status");
+		Object cphoneStringobj = requestbodyMap.get("cphone");
+		
+		int restid = Integer.parseInt((String) restidobj);
+		int tableid = Integer.parseInt((String) tableidobj);
+		long cphone = Long.parseLong((String) cphoneStringobj);
+		
+		
+		List<Order_menus> orderMenusList = orderMenusRepository.findByTables_IdAndResturant_IdAndStatusAndCphone(tableid, restid,
+				status,cphone);
+
+		if (!orderMenusList.isEmpty())
+		{
+			try
+			{
+				List<Map<String, Object>> responseList = new ArrayList<>();
+
+				for (Order_menus orderMenus : orderMenusList)
+				{
+//					System.out.println("Ordermenulist .....:"+orderMenus);
+					Map<String, Object> orderMap = new HashMap<>();
+					orderMap.put("ordermenu_id", orderMenus.getId());
+					orderMap.put("status", orderMenus.getStatus());
+					orderMap.put("quantity", orderMenus.getQuantity());
+					orderMap.put("totalprice", orderMenus.getTotalprice());
 
 //					include table details
 					TablesOfResturant tablesOfResturant = orderMenus.getTables();
@@ -241,44 +257,9 @@ public class OrderMenusController
 		}
 	}
 
-//	Get table menus by status
-	@GetMapping("/findidsofcartitem/{restid}/{tableid}/{status}")
-	public ResponseEntity<List<Map<String, Object>>> getidofcartitem(@PathVariable("tableid") int tableid,
-			@PathVariable("restid") int restid, @PathVariable("status") int status)
-	{
-		List<Order_menus> orderMenusList = orderMenusRepository.findByTables_IdAndResturant_IdAndStatus(tableid, restid,
-				status);
-
-		if (!orderMenusList.isEmpty())
-		{
-			try
-			{
-				List<Map<String, Object>> responseList = new ArrayList<>();
-
-				for (Order_menus orderMenus : orderMenusList)
-				{
-
-					Map<String, Object> orderMap = new HashMap<>();
-
-					// Include menu details
-					Menu menu = orderMenus.getMenus();
-					orderMap.put("id", menu.getId());
-
-					responseList.add(orderMap);
-				}
-
-				return ResponseEntity.ok().body(responseList);
-			} catch (Exception e)
-			{
-				return ResponseEntity.internalServerError().build();
-			}
-		} else
-		{
-			return ResponseEntity.notFound().build();
-		}
-	}
 	
-//	test for up
+	
+//	GET Ids of the cart
 	@PostMapping("/findidsofcartitem")
 	public ResponseEntity<List<Map<String,Object>>> getidsofCartitem(@RequestBody Map<String, Object> requestbodyMap)
 	{
