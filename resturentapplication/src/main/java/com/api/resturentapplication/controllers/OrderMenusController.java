@@ -668,8 +668,6 @@ public class OrderMenusController
 						
 						orderMenusResponseList.add(orderMap);
 					}
-
-					
 				}
 
 				Optional<Resturant> findById = restRepos.findById(restid);
