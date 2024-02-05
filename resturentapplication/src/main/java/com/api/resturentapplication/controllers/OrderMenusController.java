@@ -775,6 +775,7 @@ public class OrderMenusController
 				float discountofRestaurnat = resturant.getAdditionaldiscount();
 				billwithdiscount = billwithoutdiscount - (billwithoutdiscount * discountofRestaurnat / 100);
 
+				responseMap.put("discountofRestaurnat", discountofRestaurnat);
 				responseMap.put("billwithdiscount", billwithdiscount);
 				responseMap.put("billwithoutdiscount", billwithoutdiscount);
 				responseMap.put("ordermenus", orderMenusResponseList);
