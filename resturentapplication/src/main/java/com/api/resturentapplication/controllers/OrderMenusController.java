@@ -485,6 +485,7 @@ public class OrderMenusController
 
 		int restid = Integer.parseInt((String) restidobj);
 		int tableid = Integer.parseInt((String) tableidobj);
+		
 		long cphone = Long.parseLong((String) cphoneStringobj);
 
 		Optional<TablesOfResturant> findByIdAndResturant_id = tableofResturentRepository
@@ -609,6 +610,104 @@ public class OrderMenusController
 
 		List<Order_menus> orderMenusList = orderMenusRepository
 				.findByTables_IdAndResturant_IdAndStatus(tableid, restid, status);
+
+		if (!orderMenusList.isEmpty())
+		{
+			float billwithoutdiscount = 0;
+			float billwithdiscount = 0;
+			try
+			{
+				Map<String, Object> responseMap = new HashMap<>();
+				List<Map<String, Object>> orderMenusResponseList = new ArrayList<>();
+
+				for (Order_menus orderMenus : orderMenusList)
+				{
+
+					
+
+
+					// Include menu details
+					Menu menu = orderMenus.getMenus();
+					
+					
+					
+					int orderId = menu.getId();
+				    boolean isIdPresent = orderMenusResponseList.stream()
+				            .anyMatch(order -> ((Integer) order.get("id")) == orderId);
+
+				    if (isIdPresent) {
+				        // ID is already present, update the quantity
+				        Map<String, Object> existingOrder = orderMenusResponseList.stream()
+				                .filter(order -> ((Integer) order.get("id")) == orderId)
+				                .findFirst()
+				                .orElse(null);
+
+				        if (existingOrder != null) {
+				            int existingQuantity = (Integer) existingOrder.get("quantity");
+				            existingOrder.put("quantity", existingQuantity + 1);
+				           
+				            float discount = menu.getDiscount();
+				            float price = menu.getPrice();
+				            float discountedprice = (float) (price - (price * discount / 100.0));
+							billwithoutdiscount += discountedprice;
+				        }
+				    }else {
+				    	Map<String, Object> orderMap = new HashMap<>();
+//						orderMap.put("ordermenu_id", orderMenus.getId());
+						orderMap.put("quantity", orderMenus.getQuantity());
+						orderMap.put("id", menu.getId());
+						orderMap.put("name", menu.getName());
+
+						float discount = menu.getDiscount();
+						orderMap.put("discount", discount);
+						float price = menu.getPrice();
+						orderMap.put("price", price);
+						float discountedprice = (float) (price - (price * discount / 100.0));
+						billwithoutdiscount += discountedprice;
+						orderMap.put("discountedprice", discountedprice);
+						
+						orderMenusResponseList.add(orderMap);
+					}
+
+					
+				}
+
+				Optional<Resturant> findById = restRepos.findById(restid);
+				Resturant resturant = findById.get();
+				float discountofRestaurnat = resturant.getAdditionaldiscount();
+				billwithdiscount = billwithoutdiscount - (billwithoutdiscount * discountofRestaurnat / 100);
+
+				responseMap.put("billwithdiscount", billwithdiscount);
+				responseMap.put("billwithoutdiscount", billwithoutdiscount);
+				responseMap.put("ordermenus", orderMenusResponseList);
+
+				return ResponseEntity.ok().body(responseMap);
+			} catch (Exception e)
+			{
+				return ResponseEntity.internalServerError().build();
+			}
+		} else
+		{
+			return ResponseEntity.notFound().build();
+		}
+	}
+	
+//	get invoice menus
+	@PostMapping("/getinvoicemenus/customer")
+	public ResponseEntity<Map<String, Object>> getInvoicemenusforcustomer(@RequestBody Map<String, Object> requestbodyMap)
+	{
+		Object restidobj = requestbodyMap.get("restid");
+		Object tableidobj = requestbodyMap.get("tableid");
+		int status = (int) requestbodyMap.get("status");
+		Object cphoneStringobj = requestbodyMap.get("cphone");
+		
+		long cphone = Long.parseLong((String) cphoneStringobj);
+		int restid = Integer.parseInt((String) restidobj);
+		int tableid = Integer.parseInt((String) tableidobj);
+
+
+		List<Order_menus> orderMenusList = orderMenusRepository
+				.findByTables_IdAndResturant_IdAndStatusAndCphone(tableid, restid, status,cphone);
 
 		if (!orderMenusList.isEmpty())
 		{
