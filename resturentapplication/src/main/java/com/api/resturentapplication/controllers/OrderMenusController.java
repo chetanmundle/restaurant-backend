@@ -621,37 +621,54 @@ public class OrderMenusController
 
 				for (Order_menus orderMenus : orderMenusList)
 				{
-//					System.out.println("Ordermenulist .....:"+orderMenus);
-					Map<String, Object> orderMap = new HashMap<>();
-//					orderMap.put("ordermenu_id", orderMenus.getId());
-					orderMap.put("quantity", orderMenus.getQuantity());
-//					orderMap.put("totalprice", orderMenus.getTotalprice());
 
-//					include table details
-//					TablesOfResturant tablesOfResturant = orderMenus.getTables();
-//					orderMap.put("tableid", tablesOfResturant.getId());
+					
+
 
 					// Include menu details
 					Menu menu = orderMenus.getMenus();
-					orderMap.put("id", menu.getId());
-					orderMap.put("name", menu.getName());
-//					orderMap.put("foodtype", menu.getFoodtype());
-//					orderMap.put("isveg", menu.getIsveg());
-					float discount = menu.getDiscount();
-					orderMap.put("discount", discount);
-//					orderMap.put("ispopular", menu.getIspopular());
-//					orderMap.put("carbs", menu.getCarbs());
-//					orderMap.put("proteins", menu.getProteins());
-//					orderMap.put("calories", menu.getCalories());
-//					orderMap.put("fooddetails", menu.getFooddetails());
-//					orderMap.put("foodimg", menu.getFoodimg());
-					float price = menu.getPrice();
-					orderMap.put("price", price);
-					float discountedprice = (float) (price - (price * discount / 100.0));
-					billwithoutdiscount += discountedprice;
-					orderMap.put("discountedprice", discountedprice);
+					
+					
+					
+					int orderId = menu.getId();
+				    boolean isIdPresent = orderMenusResponseList.stream()
+				            .anyMatch(order -> ((Integer) order.get("id")) == orderId);
 
-					orderMenusResponseList.add(orderMap);
+				    if (isIdPresent) {
+				        // ID is already present, update the quantity
+				        Map<String, Object> existingOrder = orderMenusResponseList.stream()
+				                .filter(order -> ((Integer) order.get("id")) == orderId)
+				                .findFirst()
+				                .orElse(null);
+
+				        if (existingOrder != null) {
+				            int existingQuantity = (Integer) existingOrder.get("quantity");
+				            existingOrder.put("quantity", existingQuantity + 1);
+				           
+				            float discount = menu.getDiscount();
+				            float price = menu.getPrice();
+				            float discountedprice = (float) (price - (price * discount / 100.0));
+							billwithoutdiscount += discountedprice;
+				        }
+				    }else {
+				    	Map<String, Object> orderMap = new HashMap<>();
+//						orderMap.put("ordermenu_id", orderMenus.getId());
+						orderMap.put("quantity", orderMenus.getQuantity());
+						orderMap.put("id", menu.getId());
+						orderMap.put("name", menu.getName());
+
+						float discount = menu.getDiscount();
+						orderMap.put("discount", discount);
+						float price = menu.getPrice();
+						orderMap.put("price", price);
+						float discountedprice = (float) (price - (price * discount / 100.0));
+						billwithoutdiscount += discountedprice;
+						orderMap.put("discountedprice", discountedprice);
+						
+						orderMenusResponseList.add(orderMap);
+					}
+
+					
 				}
 
 				Optional<Resturant> findById = restRepos.findById(restid);
