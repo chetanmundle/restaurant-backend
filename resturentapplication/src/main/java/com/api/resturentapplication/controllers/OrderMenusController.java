@@ -773,8 +773,10 @@ public class OrderMenusController
 				Optional<Resturant> findById = restRepos.findById(restid);
 				Resturant resturant = findById.get();
 				float discountofRestaurnat = resturant.getAdditionaldiscount();
+				
 				billwithdiscount = billwithoutdiscount - (billwithoutdiscount * discountofRestaurnat / 100);
-
+				
+				responseMap.put("discountofRestaurnat", discountofRestaurnat);
 				responseMap.put("discountofRestaurnat", discountofRestaurnat);
 				responseMap.put("billwithdiscount", billwithdiscount);
 				responseMap.put("billwithoutdiscount", billwithoutdiscount);
