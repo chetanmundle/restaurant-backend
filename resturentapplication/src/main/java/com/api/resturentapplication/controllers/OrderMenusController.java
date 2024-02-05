@@ -675,8 +675,16 @@ public class OrderMenusController
 				Optional<Resturant> findById = restRepos.findById(restid);
 				Resturant resturant = findById.get();
 				float discountofRestaurnat = resturant.getAdditionaldiscount();
+				
 				billwithdiscount = billwithoutdiscount - (billwithoutdiscount * discountofRestaurnat / 100);
-
+				
+				Optional<TablesOfResturant> tabledetails = tableofResturentRepository.findByIdAndResturant_id(tableid, restid);
+				TablesOfResturant tablesOfResturant = tabledetails.get();
+				responseMap.put("cname", tablesOfResturant.getCname());
+				responseMap.put("cphone", tablesOfResturant.getCphone());
+				responseMap.put("restaurantname", resturant.getRest_name());
+				responseMap.put("discountofRestaurnat", discountofRestaurnat);
+				
 				responseMap.put("billwithdiscount", billwithdiscount);
 				responseMap.put("billwithoutdiscount", billwithoutdiscount);
 				responseMap.put("ordermenus", orderMenusResponseList);
