@@ -776,7 +776,11 @@ public class OrderMenusController
 				
 				billwithdiscount = billwithoutdiscount - (billwithoutdiscount * discountofRestaurnat / 100);
 				
-				responseMap.put("discountofRestaurnat", discountofRestaurnat);
+				Optional<TablesOfResturant> tabledetails = tableofResturentRepository.findByIdAndResturant_id(tableid, restid);
+				TablesOfResturant tablesOfResturant = tabledetails.get();
+				responseMap.put("cname", tablesOfResturant.getCname());
+				responseMap.put("cphone", tablesOfResturant.getCphone());
+				responseMap.put("restaurantname", resturant.getRest_name());
 				responseMap.put("discountofRestaurnat", discountofRestaurnat);
 				responseMap.put("billwithdiscount", billwithdiscount);
 				responseMap.put("billwithoutdiscount", billwithoutdiscount);
