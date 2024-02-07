@@ -818,6 +818,8 @@ public class OrderMenusController
 		}
 	}
 	
+	
+//	add data after taking payment to anather table and delete from order menu table
 	@DeleteMapping("/vacanttable/delete")
 	public ResponseEntity<String> vacantable(@RequestBody Map<String, Object> requestbodyMap)
 	{
@@ -834,7 +836,7 @@ public class OrderMenusController
 		
 		
 		
-		Optional<Resturant> findById = restRepos.findById(tableid);
+		Optional<Resturant> findById = restRepos.findById(restid);
 //		List<Order_menus> listoforder = orderMenusRepository.findByTables_IdAndResturant_IdAndStatusAndCphone(tableid, restid, status, cphone);
 		Optional<TablesOfResturant> findtable = tableofResturentRepository.findByIdAndResturant_id(tableid, restid);
 		
@@ -863,7 +865,7 @@ public class OrderMenusController
 					Previousdata previousdata = new Previousdata();
 					previousdata.setCustomer(customer);
 					previousdata.setMenus(order_menus.getMenus());
-					
+					previousdata.setQuantity(order_menus.getQuantity());
 					previousdataRepos.save(previousdata);			
 					
 				}
@@ -889,7 +891,7 @@ public class OrderMenusController
 		
 			
 		}else {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Data not found");
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Rest and table  not found");
 		}
 		
 	}

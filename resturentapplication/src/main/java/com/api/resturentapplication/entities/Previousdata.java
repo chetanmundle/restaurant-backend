@@ -22,7 +22,6 @@ public class Previousdata
 	private long id;
 	
 	
-	
 	@ManyToOne
 	@JsonIgnore
 	private Customer customer;
@@ -31,14 +30,20 @@ public class Previousdata
 	@ManyToOne
 	@JsonIgnore
 	private Menu menus;
+	
+	private int quantity;
 
 
-	public Previousdata(long id, Customer customer, Menu menus)
+	
+
+
+	public Previousdata(long id, Customer customer, Menu menus, int quantity)
 	{
 		super();
 		this.id = id;
 		this.customer = customer;
 		this.menus = menus;
+		this.quantity = quantity;
 	}
 
 
@@ -82,6 +87,20 @@ public class Previousdata
 	{
 		this.menus = menus;
 	}
+
+
+	public int getQuantity()
+	{
+		return quantity;
+	}
+
+
+	public void setQuantity(int quantity)
+	{
+		this.quantity = quantity;
+	}
+	
+	
 	
 	
 }
