@@ -868,6 +868,13 @@ public class OrderMenusController
 					
 				}
 				
+//				set vacant table
+				tablesOfResturant.setCname(null);
+				tablesOfResturant.setCphone(0);
+				tablesOfResturant.setStatus(0);
+				tableofResturentRepository.save(tablesOfResturant);
+				
+//				delete all from order menu table
 				orderMenusRepository.deleteAll(listoforder);
 				
 				return ResponseEntity.status(HttpStatus.OK).body("Data saved and delete successfully");
