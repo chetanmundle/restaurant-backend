@@ -1,6 +1,7 @@
 package com.api.resturentapplication.controllers;
 
 import java.util.Map;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -12,6 +13,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,12 +23,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.api.resturentapplication.dao.CustomerRepos;
 import com.api.resturentapplication.dao.MenuRepos;
 import com.api.resturentapplication.dao.OrderMenusRepository;
+import com.api.resturentapplication.dao.PreviousdataRepos;
 import com.api.resturentapplication.dao.RestRepos;
 import com.api.resturentapplication.dao.TableofResturentRepository;
+import com.api.resturentapplication.entities.Customer;
 import com.api.resturentapplication.entities.Menu;
 import com.api.resturentapplication.entities.Order_menus;
+import com.api.resturentapplication.entities.Previousdata;
 import com.api.resturentapplication.entities.Resturant;
 import com.api.resturentapplication.entities.TablesOfResturant;
 
@@ -46,6 +52,12 @@ public class OrderMenusController
 
 	@Autowired
 	private MenuRepos menuRepos;
+	
+	@Autowired
+	private CustomerRepos customerRepos;
+	
+	@Autowired
+	private PreviousdataRepos previousdataRepos;
 
 //	@Autowired
 //	private Order_menus order_menus;
@@ -804,6 +816,75 @@ public class OrderMenusController
 		{
 			return ResponseEntity.notFound().build();
 		}
+	}
+	
+	@DeleteMapping("/vacanttable/delete")
+	public ResponseEntity<String> vacantable(@RequestBody Map<String, Object> requestbodyMap)
+	{
+		int status = 3;
+		
+		Object restidobj = requestbodyMap.get("restid");
+		Object tableidobj = requestbodyMap.get("tableid");
+//		Object cphoneStringobj = requestbodyMap.get("cphone");
+//		String cname = (String) requestbodyMap.get("cname");
+		
+//		long cphone = Long.parseLong((String) cphoneStringobj);
+		int restid = Integer.parseInt((String) restidobj);
+		int tableid = Integer.parseInt((String) tableidobj);
+		
+		
+		
+		Optional<Resturant> findById = restRepos.findById(tableid);
+//		List<Order_menus> listoforder = orderMenusRepository.findByTables_IdAndResturant_IdAndStatusAndCphone(tableid, restid, status, cphone);
+		Optional<TablesOfResturant> findtable = tableofResturentRepository.findByIdAndResturant_id(tableid, restid);
+		
+		
+		
+		if ( findById.isPresent() && findtable.isPresent())
+		{
+			
+			Resturant resturant = findById.get();
+			TablesOfResturant tablesOfResturant = findtable.get();
+			long cphone = tablesOfResturant.getCphone();
+			String cname = tablesOfResturant.getCname();
+			List<Order_menus> listoforder = orderMenusRepository.findByTables_IdAndResturant_IdAndStatusAndCphone(tableid, restid, status, cphone);
+			
+			if(!listoforder.isEmpty()) {
+				Customer customer = new Customer();
+				customer.setCname(cname);
+				customer.setCphone(cphone);
+				customer.setResturant(resturant);
+				customer.setLocaldatetime(LocalDateTime.now());
+				
+				customerRepos.save(customer);
+							
+				for(Order_menus order_menus:listoforder)
+				{
+					Previousdata previousdata = new Previousdata();
+					previousdata.setCustomer(customer);
+					previousdata.setMenus(order_menus.getMenus());
+					
+					previousdataRepos.save(previousdata);			
+					
+				}
+				
+				orderMenusRepository.deleteAll(listoforder);
+				
+				return ResponseEntity.status(HttpStatus.OK).body("Data saved and delete successfully");
+				
+				
+				
+			}else {
+				return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Order list not found");
+			}
+			
+				
+		
+			
+		}else {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Data not found");
+		}
+		
 	}
 
 }

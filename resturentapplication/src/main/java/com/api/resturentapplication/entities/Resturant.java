@@ -35,6 +35,9 @@ public class Resturant
 
 	@OneToMany(mappedBy = "resturant")
 	List<Order_menus> order_menus = new ArrayList<>();
+	
+	@OneToMany(mappedBy = "resturant",cascade = CascadeType.ALL)
+	List<Customer> customers = new ArrayList<>();
 
 	public Resturant(int id, String rest_name, int additionaldiscount, List<Menu> menus,
 			List<TablesOfResturant> tablesOfResturants, List<Order_menus> order_menus)

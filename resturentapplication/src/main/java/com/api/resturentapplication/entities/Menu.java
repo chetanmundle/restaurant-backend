@@ -52,9 +52,12 @@ public class Menu
 
 	
 	private String foodimg;
-
+ 
 	@OneToMany(mappedBy = "menus", cascade = CascadeType.ALL)
 	List<Order_menus> order_menus = new ArrayList<>();
+	
+	@OneToMany(mappedBy = "menus",cascade = CascadeType.ALL)
+	List<Previousdata> previousdatas =  new ArrayList<>();
 
 	
 
