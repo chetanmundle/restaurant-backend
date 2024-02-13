@@ -1,5 +1,6 @@
 package com.api.resturentapplication.entities;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,30 +45,47 @@ public class Order_menus
 	private int totalprice;
 
 	private long cphone;
+	
+	private LocalDateTime datetime;
 
 //	private 
 
 
 
+	
+
+	
+	
 	public Order_menus(int id, Resturant resturant, int status, TablesOfResturant tables, Menu menus, int quantity,
-			int totalprice, long cphone)
+		int totalprice, long cphone, LocalDateTime dataTime)
+{
+	super();
+	this.id = id;
+	this.resturant = resturant;
+	this.status = status;
+	this.tables = tables;
+	this.menus = menus;
+	this.quantity = quantity;
+	this.totalprice = totalprice;
+	this.cphone = cphone;
+	this.datetime = dataTime;
+}
+
+	public LocalDateTime getDataTime()
 	{
-		super();
-		this.id = id;
-		this.resturant = resturant;
-		this.status = status;
-		this.tables = tables;
-		this.menus = menus;
-		this.quantity = quantity;
-		this.totalprice = totalprice;
-		this.cphone = cphone;
+		return datetime;
 	}
 
+	public void setDataTime(LocalDateTime dataTime)
+	{
+		this.datetime = dataTime;
+	}
+	
 	public int getTotalprice()
 	{
 		return totalprice;
 	}
-	
+
 	public void setTotalprice(int totalprice)
 	{
 		this.totalprice = totalprice;

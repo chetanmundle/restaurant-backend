@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,6 +41,7 @@ import com.api.resturentapplication.entities.TablesOfResturant;
 @RestController
 @RequestMapping("/ordermenus")
 @CrossOrigin(origins = "*")
+@EnableScheduling
 public class OrderMenusController
 {
 	@Autowired
@@ -52,10 +55,10 @@ public class OrderMenusController
 
 	@Autowired
 	private MenuRepos menuRepos;
-	
+
 	@Autowired
 	private CustomerRepos customerRepos;
-	
+
 	@Autowired
 	private PreviousdataRepos previousdataRepos;
 
@@ -104,6 +107,7 @@ public class OrderMenusController
 							order_menus.setStatus(1);
 							order_menus.setQuantity(1);
 							order_menus.setCphone(cphone);
+							order_menus.setDataTime(LocalDateTime.now());
 							int price = menu.getPrice();
 							int discount = menu.getDiscount();
 							order_menus.setTotalprice(price - (price * discount / 100));
@@ -497,7 +501,7 @@ public class OrderMenusController
 
 		int restid = Integer.parseInt((String) restidobj);
 		int tableid = Integer.parseInt((String) tableidobj);
-		
+
 		long cphone = Long.parseLong((String) cphoneStringobj);
 
 		Optional<TablesOfResturant> findByIdAndResturant_id = tableofResturentRepository
@@ -619,9 +623,8 @@ public class OrderMenusController
 		int restid = Integer.parseInt((String) restidobj);
 		int tableid = Integer.parseInt((String) tableidobj);
 
-
-		List<Order_menus> orderMenusList = orderMenusRepository
-				.findByTables_IdAndResturant_IdAndStatus(tableid, restid, status);
+		List<Order_menus> orderMenusList = orderMenusRepository.findByTables_IdAndResturant_IdAndStatus(tableid, restid,
+				status);
 
 		if (!orderMenusList.isEmpty())
 		{
@@ -635,36 +638,32 @@ public class OrderMenusController
 				for (Order_menus orderMenus : orderMenusList)
 				{
 
-					
-
-
 					// Include menu details
 					Menu menu = orderMenus.getMenus();
-					
-					
-					
+
 					int orderId = menu.getId();
-				    boolean isIdPresent = orderMenusResponseList.stream()
-				            .anyMatch(order -> ((Integer) order.get("id")) == orderId);
+					boolean isIdPresent = orderMenusResponseList.stream()
+							.anyMatch(order -> ((Integer) order.get("id")) == orderId);
 
-				    if (isIdPresent) {
-				        // ID is already present, update the quantity
-				        Map<String, Object> existingOrder = orderMenusResponseList.stream()
-				                .filter(order -> ((Integer) order.get("id")) == orderId)
-				                .findFirst()
-				                .orElse(null);
+					if (isIdPresent)
+					{
+						// ID is already present, update the quantity
+						Map<String, Object> existingOrder = orderMenusResponseList.stream()
+								.filter(order -> ((Integer) order.get("id")) == orderId).findFirst().orElse(null);
 
-				        if (existingOrder != null) {
-				            int existingQuantity = (Integer) existingOrder.get("quantity");
-				            existingOrder.put("quantity", existingQuantity + 1);
-				           
-				            float discount = menu.getDiscount();
-				            float price = menu.getPrice();
-				            float discountedprice = (float) (price - (price * discount / 100.0));
+						if (existingOrder != null)
+						{
+							int existingQuantity = (Integer) existingOrder.get("quantity");
+							existingOrder.put("quantity", existingQuantity + 1);
+
+							float discount = menu.getDiscount();
+							float price = menu.getPrice();
+							float discountedprice = (float) (price - (price * discount / 100.0));
 							billwithoutdiscount += discountedprice;
-				        }
-				    }else {
-				    	Map<String, Object> orderMap = new HashMap<>();
+						}
+					} else
+					{
+						Map<String, Object> orderMap = new HashMap<>();
 //						orderMap.put("ordermenu_id", orderMenus.getId());
 						orderMap.put("quantity", orderMenus.getQuantity());
 						orderMap.put("id", menu.getId());
@@ -677,7 +676,7 @@ public class OrderMenusController
 						float discountedprice = (float) (price - (price * discount / 100.0));
 						billwithoutdiscount += discountedprice;
 						orderMap.put("discountedprice", discountedprice);
-						
+
 						orderMenusResponseList.add(orderMap);
 					}
 				}
@@ -685,23 +684,23 @@ public class OrderMenusController
 				Optional<Resturant> findById = restRepos.findById(restid);
 				Resturant resturant = findById.get();
 				float discountofRestaurnat = resturant.getAdditionaldiscount();
-				
+
 				billwithdiscount = billwithoutdiscount - (billwithoutdiscount * discountofRestaurnat / 100);
-				
-				Optional<TablesOfResturant> tabledetails = tableofResturentRepository.findByIdAndResturant_id(tableid, restid);
+
+				Optional<TablesOfResturant> tabledetails = tableofResturentRepository.findByIdAndResturant_id(tableid,
+						restid);
 				TablesOfResturant tablesOfResturant = tabledetails.get();
 				responseMap.put("cname", tablesOfResturant.getCname());
 				responseMap.put("cphone", tablesOfResturant.getCphone());
 				responseMap.put("restaurantname", resturant.getRest_name());
 				responseMap.put("discountofRestaurnat", discountofRestaurnat);
-				 
-				
+
 				responseMap.put("billwithdiscount", billwithdiscount);
 				responseMap.put("billwithoutdiscount", billwithoutdiscount);
 				responseMap.put("ordermenus", orderMenusResponseList);
 
 				return ResponseEntity.ok().body(responseMap);
-				
+
 			} catch (Exception e)
 			{
 				return ResponseEntity.internalServerError().build();
@@ -711,23 +710,23 @@ public class OrderMenusController
 			return ResponseEntity.notFound().build();
 		}
 	}
-	
+
 //	get invoice menus
 	@PostMapping("/getinvoicemenus/customer")
-	public ResponseEntity<Map<String, Object>> getInvoicemenusforcustomer(@RequestBody Map<String, Object> requestbodyMap)
+	public ResponseEntity<Map<String, Object>> getInvoicemenusforcustomer(
+			@RequestBody Map<String, Object> requestbodyMap)
 	{
 		Object restidobj = requestbodyMap.get("restid");
 		Object tableidobj = requestbodyMap.get("tableid");
 		int status = (int) requestbodyMap.get("status");
 		Object cphoneStringobj = requestbodyMap.get("cphone");
-		
+
 		long cphone = Long.parseLong((String) cphoneStringobj);
 		int restid = Integer.parseInt((String) restidobj);
 		int tableid = Integer.parseInt((String) tableidobj);
 
-
 		List<Order_menus> orderMenusList = orderMenusRepository
-				.findByTables_IdAndResturant_IdAndStatusAndCphone(tableid, restid, status,cphone);
+				.findByTables_IdAndResturant_IdAndStatusAndCphone(tableid, restid, status, cphone);
 
 		if (!orderMenusList.isEmpty())
 		{
@@ -741,36 +740,32 @@ public class OrderMenusController
 				for (Order_menus orderMenus : orderMenusList)
 				{
 
-					
-
-
 					// Include menu details
 					Menu menu = orderMenus.getMenus();
-					
-					
-					
+
 					int orderId = menu.getId();
-				    boolean isIdPresent = orderMenusResponseList.stream()
-				            .anyMatch(order -> ((Integer) order.get("id")) == orderId);
+					boolean isIdPresent = orderMenusResponseList.stream()
+							.anyMatch(order -> ((Integer) order.get("id")) == orderId);
 
-				    if (isIdPresent) {
-				        // ID is already present, update the quantity
-				        Map<String, Object> existingOrder = orderMenusResponseList.stream()
-				                .filter(order -> ((Integer) order.get("id")) == orderId)
-				                .findFirst()
-				                .orElse(null);
+					if (isIdPresent)
+					{
+						// ID is already present, update the quantity
+						Map<String, Object> existingOrder = orderMenusResponseList.stream()
+								.filter(order -> ((Integer) order.get("id")) == orderId).findFirst().orElse(null);
 
-				        if (existingOrder != null) {
-				            int existingQuantity = (Integer) existingOrder.get("quantity");
-				            existingOrder.put("quantity", existingQuantity + 1);
-				           
-				            float discount = menu.getDiscount();
-				            float price = menu.getPrice();
-				            float discountedprice = (float) (price - (price * discount / 100.0));
+						if (existingOrder != null)
+						{
+							int existingQuantity = (Integer) existingOrder.get("quantity");
+							existingOrder.put("quantity", existingQuantity + 1);
+
+							float discount = menu.getDiscount();
+							float price = menu.getPrice();
+							float discountedprice = (float) (price - (price * discount / 100.0));
 							billwithoutdiscount += discountedprice;
-				        }
-				    }else {
-				    	Map<String, Object> orderMap = new HashMap<>();
+						}
+					} else
+					{
+						Map<String, Object> orderMap = new HashMap<>();
 //						orderMap.put("ordermenu_id", orderMenus.getId());
 						orderMap.put("quantity", orderMenus.getQuantity());
 						orderMap.put("id", menu.getId());
@@ -783,26 +778,26 @@ public class OrderMenusController
 						float discountedprice = (float) (price - (price * discount / 100.0));
 						billwithoutdiscount += discountedprice;
 						orderMap.put("discountedprice", discountedprice);
-						
+
 						orderMenusResponseList.add(orderMap);
 					}
 
-					
 				}
 
 				Optional<Resturant> findById = restRepos.findById(restid);
 				Resturant resturant = findById.get();
 				float discountofRestaurnat = resturant.getAdditionaldiscount();
-				
+
 				billwithdiscount = billwithoutdiscount - (billwithoutdiscount * discountofRestaurnat / 100);
-				
-				Optional<TablesOfResturant> tabledetails = tableofResturentRepository.findByIdAndResturant_id(tableid, restid);
+
+				Optional<TablesOfResturant> tabledetails = tableofResturentRepository.findByIdAndResturant_id(tableid,
+						restid);
 				TablesOfResturant tablesOfResturant = tabledetails.get();
 				responseMap.put("cname", tablesOfResturant.getCname());
 				responseMap.put("cphone", tablesOfResturant.getCphone());
 				responseMap.put("restaurantname", resturant.getRest_name());
 				responseMap.put("discountofRestaurnat", discountofRestaurnat);
-				
+
 				responseMap.put("billwithdiscount", billwithdiscount);
 				responseMap.put("billwithoutdiscount", billwithoutdiscount);
 				responseMap.put("ordermenus", orderMenusResponseList);
@@ -817,83 +812,86 @@ public class OrderMenusController
 			return ResponseEntity.notFound().build();
 		}
 	}
-	
-	
+
 //	add data after taking payment to anather table and delete from order menu table
 	@DeleteMapping("/vacanttable/delete")
 	public ResponseEntity<String> vacantable(@RequestBody Map<String, Object> requestbodyMap)
 	{
 		int status = 3;
-		
+
 		Object restidobj = requestbodyMap.get("restid");
 		Object tableidobj = requestbodyMap.get("tableid");
 //		Object cphoneStringobj = requestbodyMap.get("cphone");
 //		String cname = (String) requestbodyMap.get("cname");
-		
+
 //		long cphone = Long.parseLong((String) cphoneStringobj);
 		int restid = Integer.parseInt((String) restidobj);
 		int tableid = Integer.parseInt((String) tableidobj);
-		
-		
-		
+
 		Optional<Resturant> findById = restRepos.findById(restid);
 //		List<Order_menus> listoforder = orderMenusRepository.findByTables_IdAndResturant_IdAndStatusAndCphone(tableid, restid, status, cphone);
 		Optional<TablesOfResturant> findtable = tableofResturentRepository.findByIdAndResturant_id(tableid, restid);
-		
-		
-		
-		if ( findById.isPresent() && findtable.isPresent())
+
+		if (findById.isPresent() && findtable.isPresent())
 		{
-			
+
 			Resturant resturant = findById.get();
 			TablesOfResturant tablesOfResturant = findtable.get();
 			long cphone = tablesOfResturant.getCphone();
 			String cname = tablesOfResturant.getCname();
-			List<Order_menus> listoforder = orderMenusRepository.findByTables_IdAndResturant_IdAndStatusAndCphone(tableid, restid, status, cphone);
-			
-			if(!listoforder.isEmpty()) {
+			List<Order_menus> listoforder = orderMenusRepository
+					.findByTables_IdAndResturant_IdAndStatusAndCphone(tableid, restid, status, cphone);
+
+			if (!listoforder.isEmpty())
+			{
 				Customer customer = new Customer();
 				customer.setCname(cname);
 				customer.setCphone(cphone);
 				customer.setResturant(resturant);
 				customer.setLocaldatetime(LocalDateTime.now());
-				
+
 				customerRepos.save(customer);
-							
-				for(Order_menus order_menus:listoforder)
+
+				for (Order_menus order_menus : listoforder)
 				{
 					Previousdata previousdata = new Previousdata();
 					previousdata.setCustomer(customer);
 					previousdata.setMenus(order_menus.getMenus());
 					previousdata.setQuantity(order_menus.getQuantity());
-					previousdataRepos.save(previousdata);			
-					
+					previousdataRepos.save(previousdata);
+
 				}
-				
+
 //				set vacant table
 				tablesOfResturant.setCname(null);
 				tablesOfResturant.setCphone(0);
 				tablesOfResturant.setStatus(0);
 				tableofResturentRepository.save(tablesOfResturant);
-				
+
 //				delete all from order menu table
 				orderMenusRepository.deleteAll(listoforder);
-				
+
 				return ResponseEntity.status(HttpStatus.OK).body("Data saved and delete successfully");
-				
-				
-				
-			}else {
+
+			} else
+			{
 				return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Order list not found");
 			}
-			
-				
-		
-			
-		}else {
+
+		} else
+		{
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Rest and table  not found");
 		}
-		
+
+	}
+
+	@Scheduled(fixedDelay = 60000) // Run every 5 minutes (300,000 milliseconds)
+	public void deleteOldData()
+	{
+		LocalDateTime timetodelete = LocalDateTime.now().minusMinutes(2);
+		List<Order_menus> entities = orderMenusRepository.findByDatetimeBeforeAndStatus(timetodelete,1);
+		orderMenusRepository.deleteAll(entities);
+		System.out.println("Deleted old data: " + entities.size() + " entries.");
 	}
 
 }
