@@ -885,10 +885,10 @@ public class OrderMenusController
 
 	}
 
-	@Scheduled(fixedDelay = 60000) // Run every 5 minutes (300,000 milliseconds)
+	@Scheduled(fixedDelay = 60000) 
 	public void deleteOldData()
 	{
-		LocalDateTime timetodelete = LocalDateTime.now().minusMinutes(2);
+		LocalDateTime timetodelete = LocalDateTime.now().minusMinutes(20);
 		List<Order_menus> entities = orderMenusRepository.findByDatetimeBeforeAndStatus(timetodelete,1);
 		orderMenusRepository.deleteAll(entities);
 		System.out.println("Deleted old data: " + entities.size() + " entries.");
