@@ -38,6 +38,8 @@ import com.api.resturentapplication.entities.Previousdata;
 import com.api.resturentapplication.entities.Resturant;
 import com.api.resturentapplication.entities.TablesOfResturant;
 
+import aj.org.objectweb.asm.Label;
+
 @RestController
 @RequestMapping("/ordermenus")
 @CrossOrigin(origins = "*")
@@ -730,6 +732,7 @@ public class OrderMenusController
 
 		if (!orderMenusList.isEmpty())
 		{
+		
 			float billwithoutdiscount = 0;
 			float billwithdiscount = 0;
 			try
@@ -744,6 +747,7 @@ public class OrderMenusController
 					Menu menu = orderMenus.getMenus();
 
 					int orderId = menu.getId();
+				
 					boolean isIdPresent = orderMenusResponseList.stream()
 							.anyMatch(order -> ((Integer) order.get("id")) == orderId);
 
@@ -756,13 +760,15 @@ public class OrderMenusController
 						if (existingOrder != null)
 						{
 							int existingQuantity = (Integer) existingOrder.get("quantity");
-							existingOrder.put("quantity", existingQuantity + 1);
+							existingOrder.put("quantity", existingQuantity + orderMenus.getQuantity());
+							
 
 							float discount = menu.getDiscount();
 							float price = menu.getPrice();
 							float discountedprice = (float) (price - (price * discount / 100.0));
-							billwithoutdiscount += discountedprice;
+							billwithoutdiscount += discountedprice * orderMenus.getQuantity() ;
 						}
+						
 					} else
 					{
 						Map<String, Object> orderMap = new HashMap<>();
@@ -776,11 +782,13 @@ public class OrderMenusController
 						float price = menu.getPrice();
 						orderMap.put("price", price);
 						float discountedprice = (float) (price - (price * discount / 100.0));
-						billwithoutdiscount += discountedprice;
+						billwithoutdiscount += discountedprice * orderMenus.getQuantity() ;
 						orderMap.put("discountedprice", discountedprice);
 
 						orderMenusResponseList.add(orderMap);
+						
 					}
+			
 
 				}
 
@@ -885,7 +893,7 @@ public class OrderMenusController
 
 	}
 
-	@Scheduled(fixedDelay = 60000) 
+	@Scheduled(fixedDelay = 600000) 
 	public void deleteOldData()
 	{
 		LocalDateTime timetodelete = LocalDateTime.now().minusMinutes(20);
