@@ -27,6 +27,14 @@ public class Resturant
 
 	private int additionaldiscount;
 
+	private String adminuid;
+
+	private String adminpass;
+
+	private String manageruid;
+
+	private String managerpass;
+
 	@OneToMany(mappedBy = "resturant", cascade = CascadeType.ALL)
 	List<Menu> menus = new ArrayList<>();
 
@@ -35,28 +43,40 @@ public class Resturant
 
 	@OneToMany(mappedBy = "resturant")
 	List<Order_menus> order_menus = new ArrayList<>();
-	
-	@OneToMany(mappedBy = "resturant",cascade = CascadeType.ALL)
+
+	@OneToMany(mappedBy = "resturant", cascade = CascadeType.ALL)
 	List<Customer> customers = new ArrayList<>();
 
-	public Resturant(int id, String rest_name, int additionaldiscount, List<Menu> menus,
-			List<TablesOfResturant> tablesOfResturants, List<Order_menus> order_menus)
+	public Resturant(int id, String rest_name, int additionaldiscount, String adminuid, String adminpass,
+			String manageruid, String managerpass, List<Menu> menus, List<TablesOfResturant> tablesOfResturants,
+			List<Order_menus> order_menus, List<Customer> customers)
 	{
 		super();
 		this.id = id;
 		this.rest_name = rest_name;
 		this.additionaldiscount = additionaldiscount;
+		this.adminuid = adminuid;
+		this.adminpass = adminpass;
+		this.manageruid = manageruid;
+		this.managerpass = managerpass;
 		this.menus = menus;
 		this.tablesOfResturants = tablesOfResturants;
 		this.order_menus = order_menus;
+		this.customers = customers;
+	}
+
+	public Resturant(int id, String adminuid, String adminpass)
+	{
+		super();
+		this.id = id;
+		this.adminuid = adminuid;
+		this.adminpass = adminpass;
 	}
 
 	public Resturant()
 	{
 //		super();
 	}
-	
-	
 
 	public int getAdditionaldiscount()
 	{
@@ -118,60 +138,63 @@ public class Resturant
 		this.order_menus = order_menus;
 	}
 
+	public String getAdminuid()
+	{
+		return adminuid;
+	}
+
+	public void setAdminuid(String adminuid)
+	{
+		this.adminuid = adminuid;
+	}
+
+	public String getManageruid()
+	{
+		return manageruid;
+	}
+
+	public void setManageruid(String manageruid)
+	{
+		this.manageruid = manageruid;
+	}
+
+	public String getAdminpass()
+	{
+		return adminpass;
+	}
+
+	public void setAdminpass(String adminpass)
+	{
+		this.adminpass = adminpass;
+	}
+
+	public String getManagerpass()
+	{
+		return managerpass;
+	}
+
+	public void setManagerpass(String managerpass)
+	{
+		this.managerpass = managerpass;
+	}
+
+	public List<Customer> getCustomers()
+	{
+		return customers;
+	}
+
+	public void setCustomers(List<Customer> customers)
+	{
+		this.customers = customers;
+	}
+
 	@Override
 	public String toString()
 	{
-		return "Resturant [id=" + id + ", rest_name=" + rest_name + ", menus=" + menus + ", tablesOfResturants="
-				+ tablesOfResturants + ", order_menus=" + order_menus + "]";
+		return "Resturant [id=" + id + ", rest_name=" + rest_name + ", additionaldiscount=" + additionaldiscount
+				+ ", adminuid=" + adminuid + ", adminpass=" + adminpass + ", manageruid=" + manageruid
+				+ ", managerpass=" + managerpass + ", menus=" + menus + ", tablesOfResturants=" + tablesOfResturants
+				+ ", order_menus=" + order_menus + ", customers=" + customers + "]";
 	}
-
-//    public int getId() {
-//        return id;
-//    }
-//
-//    public void setId(int id) {
-//        this.id = id;
-//    }
-//
-//    public String getRest_name() {
-//        return rest_name;
-//    }
-//
-//    public void setRest_name(String rest_name) {
-//        this.rest_name = rest_name;
-//    }
-//
-//    public List<Menu> getMenus() {
-//        return menus;
-//    }
-//
-//    public void setMenus(ArrayList<Menu> menus) {
-//        this.menus = menus;
-//    }
-//
-////    @JsonProperty("menus")
-////    public List<String> getMenuNames() {
-////        List<String> menuNames = new ArrayList<>();
-////        for (Menu menu : menus) {
-////        	menuNames.add(String.valueOf(menu.getId()));
-////            menuNames.add(menu.getMenu_name());
-////        }
-////        return menuNames;
-////    }
-//
-//    public Resturant() {
-//    }
-//
-//    public Resturant(int id, String rest_name, ArrayList<Menu> menus) {
-//        this.id = id;
-//        this.rest_name = rest_name;
-//        this.menus = menus;
-//    }
-//
-//     @Override
-//     public String toString() {
-//     return "Resturant [id=" + id + ", rest_name=" + rest_name + ", menus=" +
-//     menus + "]";
-//     }
 
 }
