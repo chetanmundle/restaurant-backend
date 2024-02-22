@@ -34,6 +34,10 @@ public class Resturant
 	private String manageruid;
 
 	private String managerpass;
+	
+	private String email;
+	
+	private int otp;
 
 	@OneToMany(mappedBy = "resturant", cascade = CascadeType.ALL)
 	List<Menu> menus = new ArrayList<>();
@@ -47,9 +51,11 @@ public class Resturant
 	@OneToMany(mappedBy = "resturant", cascade = CascadeType.ALL)
 	List<Customer> customers = new ArrayList<>();
 
+	
+
 	public Resturant(int id, String rest_name, int additionaldiscount, String adminuid, String adminpass,
-			String manageruid, String managerpass, List<Menu> menus, List<TablesOfResturant> tablesOfResturants,
-			List<Order_menus> order_menus, List<Customer> customers)
+			String manageruid, String managerpass, String email, List<Menu> menus,
+			List<TablesOfResturant> tablesOfResturants, List<Order_menus> order_menus, List<Customer> customers)
 	{
 		super();
 		this.id = id;
@@ -59,6 +65,7 @@ public class Resturant
 		this.adminpass = adminpass;
 		this.manageruid = manageruid;
 		this.managerpass = managerpass;
+		this.email = email;
 		this.menus = menus;
 		this.tablesOfResturants = tablesOfResturants;
 		this.order_menus = order_menus;
@@ -187,14 +194,40 @@ public class Resturant
 	{
 		this.customers = customers;
 	}
+	
+	
+
+	public String getEmail()
+	{
+		return email;
+	}
+
+	public void setEmail(String email)
+	{
+		this.email = email;
+	}
+	
+	
+
+	public int getOtp()
+	{
+		return otp;
+	}
+
+	public void setOtp(int otp)
+	{
+		this.otp = otp;
+	}
 
 	@Override
 	public String toString()
 	{
 		return "Resturant [id=" + id + ", rest_name=" + rest_name + ", additionaldiscount=" + additionaldiscount
 				+ ", adminuid=" + adminuid + ", adminpass=" + adminpass + ", manageruid=" + manageruid
-				+ ", managerpass=" + managerpass + ", menus=" + menus + ", tablesOfResturants=" + tablesOfResturants
-				+ ", order_menus=" + order_menus + ", customers=" + customers + "]";
+				+ ", managerpass=" + managerpass + ", email=" + email + ", menus=" + menus + ", tablesOfResturants="
+				+ tablesOfResturants + ", order_menus=" + order_menus + ", customers=" + customers + "]";
 	}
+
+	
 
 }
