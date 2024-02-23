@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,6 +20,7 @@ import com.api.resturentapplication.entities.Resturant;
 
 @RequestMapping("email")
 @RestController
+@CrossOrigin(origins = "*")
 public class EmailController
 {
 
@@ -36,7 +38,7 @@ public class EmailController
 		return otp;
 	}
 
-	@PostMapping("/sendEmail")
+	@PostMapping("/sendotp")
 	public ResponseEntity<String> sendEmail(@RequestBody Map<String, Object> requestMap)
 	{
 		try
@@ -65,7 +67,7 @@ public class EmailController
 
 			} else
 			{
-				return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Email Not Found");
+				return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Invalid Email ID");
 			}
 
 		} catch (Exception e)
