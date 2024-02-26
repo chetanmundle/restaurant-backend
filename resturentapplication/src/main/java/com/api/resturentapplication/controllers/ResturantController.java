@@ -81,7 +81,7 @@ public class ResturantController
 		}
 	}
 
-//	API for the admin loggin
+//	API for the admin login / login 
 	@PostMapping("/admin/authentication")
 	public ResponseEntity<String> adminauthentication(@RequestBody Map<String, Object> requestMap)
 	{
@@ -128,7 +128,7 @@ public class ResturantController
 	}
 	
 	
-//		API for the admin loggin
+//		API for the manager loggin
 	@PostMapping("/manager/authentication")
 	public ResponseEntity<String> managerauthentication(@RequestBody Map<String, Object> requestMap)
 	{
@@ -170,10 +170,55 @@ public class ResturantController
 
 		} catch (Exception e)
 		{
-			System.out.println("Hello");
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 		}
 
+	}
+	
+//	API for the Change password of the admin/ manager
+	@PostMapping("/password/changepass")
+	public ResponseEntity<String> changepassword(@RequestBody Map<String, Object> requestMap)
+	{
+		try
+		{
+			String pass = (String) requestMap.get("password");
+			String roll = (String) requestMap.get("roll");
+			String email = (String) requestMap.get("email");
+			
+			Optional<Resturant> findByAdminemail = null;
+			
+			if(roll.equals("admin"))
+			{
+				findByAdminemail = restRepos.findByAdminemail(email);
+				if(findByAdminemail.isPresent())
+				{
+					Resturant resturant = findByAdminemail.get();
+					resturant.setAdminpass(pass);
+					restRepos.save(resturant);
+					return ResponseEntity.status(HttpStatus.OK).body("Admin Password Change Successfully");
+				}else {
+					return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Email Not Found ");
+				}
+			}else if (roll.equals("manager")) 
+			{
+				findByAdminemail = restRepos.findByManageremail(email);
+				if(findByAdminemail.isPresent())
+				{
+					Resturant resturant = findByAdminemail.get();
+					resturant.setManagerpass(pass);
+					restRepos.save(resturant);
+					return ResponseEntity.status(HttpStatus.OK).body("Manager Password Change Successfully");
+				}else {
+					return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Email Not Found ");
+				}
+			}else {
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+			}
+		} catch (Exception e)
+		{
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		}
+		
 	}
 
 }

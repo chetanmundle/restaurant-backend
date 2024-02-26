@@ -15,7 +15,10 @@ public interface RestRepos extends JpaRepository<Resturant, Integer>
 	Object getById(Resturant rest);
 
 	Optional<Resturant> findByIdAndAdminuidAndAdminpass(int id, String adminuid, String adminpass);
-	Optional<Resturant> findByEmail(String email);
+
+	Optional<Resturant> findByAdminemail(String adminemail);
+	
+	Optional<Resturant> findByManageremail(String manageremail);
 
 //	@Query(value = "SELECT * FROM RESTURANT WHERE ID = ?1", nativeQuery = true)
 //	Optional<Resturant> findrestbyid(int restid);

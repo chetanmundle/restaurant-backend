@@ -1,5 +1,6 @@
 package com.api.resturentapplication.controllers;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
@@ -15,7 +16,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.api.resturentapplication.dao.OtpRepos;
 import com.api.resturentapplication.dao.RestRepos;
+import com.api.resturentapplication.entities.Otp;
 import com.api.resturentapplication.entities.Resturant;
 
 @RequestMapping("email")
@@ -29,6 +32,9 @@ public class EmailController
 
 	@Autowired
 	RestRepos restRepos;
+
+	@Autowired
+	OtpRepos otpRepos;
 
 	private int generateOTP()
 	{
@@ -44,14 +50,27 @@ public class EmailController
 		try
 		{
 			String email = (String) requestMap.get("email");
+			String roll = (String) requestMap.get("roll");
 
-			Optional<Resturant> findByEmail = restRepos.findByEmail(email);
+			Optional<Resturant> findByEmail = null;
+
+			if (roll.equals("admin"))
+			{
+				findByEmail = restRepos.findByAdminemail(email);
+			} else if (roll.equals("manager"))
+			{
+				findByEmail = restRepos.findByManageremail(email);
+			} else
+			{
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Body Data not found");
+			}
 
 			if (findByEmail.isPresent())
 			{
 				Resturant resturant = findByEmail.get();
+				Otp otp = new Otp();
 				EmailController ec = new EmailController();
-//				
+
 				int OTP = ec.generateOTP();
 
 				SimpleMailMessage message = new SimpleMailMessage();
@@ -60,8 +79,15 @@ public class EmailController
 				message.setText("Your OTP for Forgot your Password is : " + OTP);
 				emailSender.send(message);
 
-				resturant.setOtp(OTP);
-				restRepos.save(resturant);
+				otp.setResturant(resturant);
+				otp.setRoll(roll);
+				otp.setOtp(OTP);
+				otp.setOtptime(LocalDateTime.now());
+
+				otpRepos.save(otp);
+
+//				resturant.setOtp(OTP);
+//				restRepos.save(resturant);
 
 				return ResponseEntity.status(HttpStatus.OK).body("OTP send Successfully");
 
@@ -76,6 +102,7 @@ public class EmailController
 		}
 	}
 
+//	API to OTP Authentication
 	@PostMapping("authenticate")
 	public ResponseEntity<String> validateOTP(@RequestBody Map<String, Object> requestMap)
 	{
@@ -83,25 +110,43 @@ public class EmailController
 		{
 			String email = (String) requestMap.get("email");
 			int otpuser = (int) requestMap.get("otp");
-			
-			Optional<Resturant> findByEmail = restRepos.findByEmail(email);
-			
-			if(findByEmail.isPresent())
+			String roll = (String) requestMap.get("roll");
+
+			Optional<Resturant> findByEmail = null;
+
+			if (roll.equals("admin"))
+			{
+				findByEmail = restRepos.findByAdminemail(email);
+			} else if (roll.equals("manager"))
+			{
+				findByEmail = restRepos.findByManageremail(email);
+			} else
+			{
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Body Data not found");
+			}
+
+			if (findByEmail.isPresent())
 			{
 				Resturant resturant = findByEmail.get();
-				
-				if(otpuser == resturant.getOtp())
+				Optional<Otp> findotpofdb = otpRepos.findByResturant_idAndRollAndOtp(resturant.getId(), roll, otpuser);
+
+				if (findotpofdb.isPresent())
 				{
-					resturant.setOtp(0);
-					restRepos.save(resturant);
+					Otp otp = findotpofdb.get();
+
+					otpRepos.deleteById(otp.getId());
 					return ResponseEntity.ok("OTP Successfully Varified");
-				}else {
-					return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Incorrect OTP");
+
+				} else
+				{
+					return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect OTP");
 				}
-			}else {
+
+			} else
+			{
 				return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Data Not Found");
 			}
-			
+
 		} catch (Exception e)
 		{
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal Server Error");

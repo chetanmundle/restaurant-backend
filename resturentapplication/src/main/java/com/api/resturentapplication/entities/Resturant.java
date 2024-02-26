@@ -35,9 +35,10 @@ public class Resturant
 
 	private String managerpass;
 	
-	private String email;
+	private String adminemail;
 	
-	private int otp;
+	private String manageremail;
+	
 
 	@OneToMany(mappedBy = "resturant", cascade = CascadeType.ALL)
 	List<Menu> menus = new ArrayList<>();
@@ -50,11 +51,15 @@ public class Resturant
 
 	@OneToMany(mappedBy = "resturant", cascade = CascadeType.ALL)
 	List<Customer> customers = new ArrayList<>();
+	
+	@OneToMany(mappedBy = "resturant",cascade = CascadeType.ALL)
+	List<Otp> otp = new ArrayList<>();
 
 	
 
+	
 	public Resturant(int id, String rest_name, int additionaldiscount, String adminuid, String adminpass,
-			String manageruid, String managerpass, String email, List<Menu> menus,
+			String manageruid, String managerpass, String adminemail, String manageremail, List<Menu> menus,
 			List<TablesOfResturant> tablesOfResturants, List<Order_menus> order_menus, List<Customer> customers)
 	{
 		super();
@@ -65,7 +70,9 @@ public class Resturant
 		this.adminpass = adminpass;
 		this.manageruid = manageruid;
 		this.managerpass = managerpass;
-		this.email = email;
+		this.adminemail = adminemail;
+		this.manageremail = manageremail;
+
 		this.menus = menus;
 		this.tablesOfResturants = tablesOfResturants;
 		this.order_menus = order_menus;
@@ -197,34 +204,37 @@ public class Resturant
 	
 	
 
-	public String getEmail()
-	{
-		return email;
-	}
-
-	public void setEmail(String email)
-	{
-		this.email = email;
-	}
+	
 	
 	
 
-	public int getOtp()
+	public String getAdminemail()
 	{
-		return otp;
+		return adminemail;
 	}
 
-	public void setOtp(int otp)
+	public void setAdminemail(String adminemail)
 	{
-		this.otp = otp;
+		this.adminemail = adminemail;
 	}
+
+	public String getManageremail()
+	{
+		return manageremail;
+	}
+
+	public void setManageremail(String manageremail)
+	{
+		this.manageremail = manageremail;
+	}
+
 
 	@Override
 	public String toString()
 	{
 		return "Resturant [id=" + id + ", rest_name=" + rest_name + ", additionaldiscount=" + additionaldiscount
 				+ ", adminuid=" + adminuid + ", adminpass=" + adminpass + ", manageruid=" + manageruid
-				+ ", managerpass=" + managerpass + ", email=" + email + ", menus=" + menus + ", tablesOfResturants="
+				+ ", managerpass=" + managerpass + ", adminemail=" + adminemail + ", menus=" + menus + ", tablesOfResturants="
 				+ tablesOfResturants + ", order_menus=" + order_menus + ", customers=" + customers + "]";
 	}
 
