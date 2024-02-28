@@ -28,7 +28,13 @@ public interface RestRepos extends JpaRepository<Resturant, Integer>
 
 	@Query(value = "SELECT ID,manageruid,managerpass FROM RESTURANT WHERE ID = ?1", nativeQuery = true)
 	List<Map<String, Object>> managerAuth(int restid);
+	
 
+	@Query(value = "SELECT ID,ADMINUID,ADMINPASS FROM RESTURANT WHERE ADMINUID = ?1 AND ADMINPASS = ?2",nativeQuery = true)
+	List<Map<String, Object>> adminlogin(String adminuid,String adminpass);
+	
+	@Query(value = "SELECT ID,MANAGERUID,MANAGERPASS FROM RESTURANT WHERE MANAGERUID = ?1 AND MANAGERPASS = ?2",nativeQuery = true)
+	List<Map<String, Object>> managerlogin(String manageruid,String managerpass);
 	
 
 }

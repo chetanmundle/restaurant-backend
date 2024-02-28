@@ -128,7 +128,7 @@ public class ResturantController
 	}
 	
 	
-//		API for the manager loggin
+//		API for the manager login
 	@PostMapping("/manager/authentication")
 	public ResponseEntity<String> managerauthentication(@RequestBody Map<String, Object> requestMap)
 	{
@@ -173,6 +173,39 @@ public class ResturantController
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 		}
 
+	}
+	
+//	API for login manager or admin
+	@PostMapping("/login/manager/admin")
+	public ResponseEntity<String> adminormanagerlogin(@RequestBody Map<String, Object> requestMap)
+	{
+		try
+		{
+			String username = (String) requestMap.get("username");
+			String password = (String) requestMap.get("password");
+			
+			List<Map<String, Object>> adminlogin = restRepos.adminlogin(username, password);
+			
+			if(adminlogin.isEmpty())
+			{
+				List<Map<String, Object>> managerlogin = restRepos.managerlogin(username, password);
+				
+				if(!managerlogin.isEmpty())
+				{
+					return ResponseEntity.status(HttpStatus.ACCEPTED).body("manager");
+				}else {
+					return ResponseEntity.status(HttpStatus.NOT_FOUND).body("UserName or password id Incorrect");
+				}
+			}else {
+				return ResponseEntity.status(HttpStatus.ACCEPTED).body("admin");
+			}
+			
+			
+		} catch (Exception e)
+		{
+//			System.out.println("Login catch");
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		}
 	}
 	
 //	API for the Change password of the admin/ manager

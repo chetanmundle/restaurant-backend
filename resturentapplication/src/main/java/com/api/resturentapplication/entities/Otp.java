@@ -19,18 +19,16 @@ public class Otp
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
+
 	private int otp;
-	
+
 	private LocalDateTime otptime;
-	
+
 	private String roll;
-	
+
 	@ManyToOne
 	@JsonIgnore
 	Resturant resturant;
-	
-	
 
 	public Otp()
 	{
@@ -96,9 +94,5 @@ public class Otp
 	{
 		this.resturant = resturant;
 	}
-	
-	
-	
-	
-	
+
 }
