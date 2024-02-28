@@ -3,6 +3,7 @@ package com.api.resturentapplication.entities;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.boot.context.properties.bind.DefaultValue;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
