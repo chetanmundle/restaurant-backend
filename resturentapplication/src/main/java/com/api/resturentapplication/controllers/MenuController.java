@@ -10,6 +10,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -55,43 +56,50 @@ public class MenuController
 			@RequestParam("fooddetails") String fooddetails, @RequestParam("price") int price)
 	{
 
-		Menu menu = new Menu();
-
-		Optional<Resturant> optionalResturant = restRepos.findById(restid);
-
-		if (optionalResturant.isPresent())
+		try
 		{
-			Resturant resturant = optionalResturant.get();
-			try
-			{
-				menu.setResturant(resturant); // Set the rest field in Menu entity
+			Menu menu = new Menu();
 
-				menu.setName(name);
-				menu.setFoodimg(foodimg);
-				menu.setIsveg(isveg);
-				menu.setDiscount(discount);
-				menu.setPrice(price);
-				menu.setFoodtype(foodtype);
-				menu.setIspopular(ispopular);
-				menu.setCarbs(carbs);
-				menu.setProteins(proteins);
-				menu.setCalories(calories);
-				menu.setFooddetails(fooddetails);
-				menuRepos.save(menu);
-//				return ResponseEntity.status(HttpStatus.OK).build();
-				return ResponseEntity.ok("Menu Saved");
-			} catch (Exception e)
-			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			Optional<Resturant> optionalResturant = restRepos.findById(restid);
 
-				return ResponseEntity.internalServerError().body("Internal Server Error");
+			if (optionalResturant.isPresent())
+			{
+				Resturant resturant = optionalResturant.get();
+				try
+				{
+					menu.setResturant(resturant); // Set the rest field in Menu entity
+
+					menu.setName(name);
+					menu.setFoodimg(foodimg);
+					menu.setIsveg(isveg);
+					menu.setDiscount(discount);
+					menu.setPrice(price);
+					menu.setFoodtype(foodtype);
+					menu.setIspopular(ispopular);
+					menu.setCarbs(carbs);
+					menu.setProteins(proteins);
+					menu.setCalories(calories);
+					menu.setFooddetails(fooddetails);
+					menuRepos.save(menu);
+//					return ResponseEntity.status(HttpStatus.OK).build();
+					return ResponseEntity.ok("Menu Saved");
+				} catch (Exception e)
+				{
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+
+					return ResponseEntity.internalServerError().body("Internal Server Error");
+				}
+				
+				
+			} else
+			{
+				return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Restaurant not found");
 			}
-			
-			
-		} else
+		} catch (Exception e)
 		{
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Restaurant not found");
+			System.out.println("Internal server");
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 		}
 	}
 	
@@ -313,6 +321,37 @@ public class MenuController
 		{
 			 e.printStackTrace();
 			return ResponseEntity.notFound().build();
+		}
+	}
+	
+//	API for Edit Menu
+	@PostMapping("/edit/menu/{restid}")
+	public ResponseEntity<String> editMenus(@RequestBody Menu menu,@PathVariable("restid") int restid)
+	{
+		try
+		{
+			Optional<Resturant> findrestById = restRepos.findById(restid);
+			
+			if(findrestById.isPresent())
+			{
+				Optional<Menu> findmenubyid = menuRepos.findById(menu.getId());
+				if(findmenubyid.isPresent())
+				{
+					Resturant resturant = findrestById.get();
+					menu.setResturant(resturant);
+								
+					menuRepos.save(menu);
+					return ResponseEntity.ok().body("Menu Edited Successfully");
+				}else {
+					return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Menu data not found");
+				}
+			}else {
+				return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Restaurant Not found");
+			}
+			
+		} catch (Exception e)
+		{
+			return ResponseEntity.status(500).build();
 		}
 	}
 

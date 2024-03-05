@@ -655,16 +655,39 @@ public class OrderMenusController
 
 						if (existingOrder != null)
 						{
+//							int existingQuantity = (Integer) existingOrder.get("quantity");
+//							existingOrder.put("quantity", existingQuantity + 1);
+//
+//							float discount = menu.getDiscount();
+//							float price = menu.getPrice();
+//							float discountedprice = (float) (price - (price * discount / 100.0));
+//							billwithoutdiscount += discountedprice;
 							int existingQuantity = (Integer) existingOrder.get("quantity");
-							existingOrder.put("quantity", existingQuantity + 1);
+							existingOrder.put("quantity", existingQuantity + orderMenus.getQuantity());
+							
 
 							float discount = menu.getDiscount();
 							float price = menu.getPrice();
 							float discountedprice = (float) (price - (price * discount / 100.0));
-							billwithoutdiscount += discountedprice;
+							billwithoutdiscount += discountedprice * orderMenus.getQuantity() ;
 						}
 					} else
 					{
+//						Map<String, Object> orderMap = new HashMap<>();
+////						orderMap.put("ordermenu_id", orderMenus.getId());
+//						orderMap.put("quantity", orderMenus.getQuantity());
+//						orderMap.put("id", menu.getId());
+//						orderMap.put("name", menu.getName());
+//
+//						float discount = menu.getDiscount();
+//						orderMap.put("discount", discount);
+//						float price = menu.getPrice();
+//						orderMap.put("price", price);
+//						float discountedprice = (float) (price - (price * discount / 100.0));
+//						billwithoutdiscount += discountedprice;
+//						orderMap.put("discountedprice", discountedprice);
+//
+//						orderMenusResponseList.add(orderMap);
 						Map<String, Object> orderMap = new HashMap<>();
 //						orderMap.put("ordermenu_id", orderMenus.getId());
 						orderMap.put("quantity", orderMenus.getQuantity());
@@ -676,7 +699,7 @@ public class OrderMenusController
 						float price = menu.getPrice();
 						orderMap.put("price", price);
 						float discountedprice = (float) (price - (price * discount / 100.0));
-						billwithoutdiscount += discountedprice;
+						billwithoutdiscount += discountedprice * orderMenus.getQuantity() ;
 						orderMap.put("discountedprice", discountedprice);
 
 						orderMenusResponseList.add(orderMap);
