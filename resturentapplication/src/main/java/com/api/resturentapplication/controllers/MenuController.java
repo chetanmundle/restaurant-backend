@@ -1,7 +1,7 @@
 package com.api.resturentapplication.controllers;
 
-
 import java.util.ArrayList;
+import java.util.Currency;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -85,13 +85,7 @@ public class MenuController
 
 					return ResponseEntity.internalServerError().body("Internal Server Error");
 				}
-				
-				
-				
-				
-				
-				
-				
+
 			} else
 			{
 				return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Restaurant not found");
@@ -102,7 +96,7 @@ public class MenuController
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 		}
 	}
-	
+
 //	update menu api 
 //	@PutMapping("/updatemenu/{restid}/{menuid}")
 //	public ResponseEntity<HttpStatus> updatemenu(@PathVariable("restid") int restid,@PathVariable("menuid") int menuid, 
@@ -136,11 +130,6 @@ public class MenuController
 //			return ResponseEntity.notFound().build();
 //		}
 //	}
-	
-	
-	
-	
-	
 
 //	get all menus of the particular restaurant with menu order
 	@GetMapping("/getallmenus/{restid}")
@@ -192,9 +181,10 @@ public class MenuController
 
 //	 Get on menu by Id
 	@GetMapping("/getmenu/{restid}/{menuid}")
-	public ResponseEntity<Map<String, Object>> getMenuById(@PathVariable("restid")int restid,@PathVariable("menuid") int menuid)
+	public ResponseEntity<Map<String, Object>> getMenuById(@PathVariable("restid") int restid,
+			@PathVariable("menuid") int menuid)
 	{
-		Optional<Menu> findById = menuRepos.findByIdAndResturant_id(menuid,restid);
+		Optional<Menu> findById = menuRepos.findByIdAndResturant_id(menuid, restid);
 
 		if (findById.isPresent())
 		{
@@ -266,7 +256,8 @@ public class MenuController
 
 //	get all only menus of the particular  restaurant 
 	@GetMapping("/getmenus/getallonlymenus/{restid}")
-	public ResponseEntity<List<Map<String, Object>>> getallmenusofperticularRestaurant(@PathVariable("restid") int restid)
+	public ResponseEntity<List<Map<String, Object>>> getallmenusofperticularRestaurant(
+			@PathVariable("restid") int restid)
 	{
 		Optional<List<Menu>> findByResturant_id = menuRepos.findByResturant_id(restid);
 
@@ -275,9 +266,9 @@ public class MenuController
 			try
 			{
 				List<Menu> menuList = findByResturant_id.get();
-				
+
 				List<Map<String, Object>> responseList = new ArrayList<>();
-				
+
 				for (Menu menu : menuList)
 				{
 					Map<String, Object> menuMap = new HashMap<>();
@@ -295,7 +286,7 @@ public class MenuController
 					menuMap.put("foodimg", menu.getFoodimg());
 					responseList.add(menuMap);
 				}
-				
+
 				return ResponseEntity.ok().body(responseList);
 			} catch (Exception e)
 			{
@@ -307,52 +298,56 @@ public class MenuController
 			return ResponseEntity.notFound().build();
 		}
 	}
-	
+
 //	delete perticular menu of the table by id 
 	@DeleteMapping("/deletebyid/{restid}/{menuid}")
 	@Transactional
-	public ResponseEntity<HttpStatus> deletemenuById(@PathVariable("restid") int restid,@PathVariable("menuid")int menuid)
+	public ResponseEntity<HttpStatus> deletemenuById(@PathVariable("restid") int restid,
+			@PathVariable("menuid") int menuid)
 	{
 		try
 		{
-			 menuRepos.deleteByIdAndResturant_id(menuid, restid);
-			 return ResponseEntity.noContent().build();
+			menuRepos.deleteByIdAndResturant_id(menuid, restid);
+			return ResponseEntity.noContent().build();
 		} catch (Exception e)
 		{
-			 e.printStackTrace();
+			e.printStackTrace();
 			return ResponseEntity.notFound().build();
 		}
 	}
-	
+
 //	API for Edit Menu
 	@PostMapping("/edit/menu/{restid}")
-	public ResponseEntity<String> editMenus(@RequestBody Menu menu,@PathVariable("restid") int restid)
+	public ResponseEntity<String> editMenus(@RequestBody Menu menu, @PathVariable("restid") int restid)
 	{
 		try
 		{
 			Optional<Resturant> findrestById = restRepos.findById(restid);
-			
-			if(findrestById.isPresent())
+
+			if (findrestById.isPresent())
 			{
 				Optional<Menu> findmenubyid = menuRepos.findById(menu.getId());
-				if(findmenubyid.isPresent())
+				if (findmenubyid.isPresent())
 				{
 					Resturant resturant = findrestById.get();
 					menu.setResturant(resturant);
-								
+
 					menuRepos.save(menu);
 					return ResponseEntity.ok().body("Menu Edited Successfully");
-				}else {
+				} else
+				{
 					return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Menu data not found");
 				}
-			}else {
+			} else
+			{
 				return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Restaurant Not found");
 			}
-			
+
 		} catch (Exception e)
 		{
 			return ResponseEntity.status(500).build();
 		}
 	}
+	
 
 }

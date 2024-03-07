@@ -31,77 +31,79 @@ public class TableController
 {
 	@Autowired
 	private TableofResturentRepository tableofResturentRepository;
-	
+
 	@Autowired
 	private RestRepos restRepos;
-	
+
 	@PostMapping("/savetable/{restid}")
-	public ResponseEntity<TablesOfResturant> saveTable( @PathVariable("restid") int restid){
+	public ResponseEntity<TablesOfResturant> saveTable(@PathVariable("restid") int restid)
+	{
 		Optional<Resturant> optionalResturant = restRepos.findById(restid);
-		
-		if(optionalResturant.isPresent()) {
-			TablesOfResturant tablesOfResturant=new TablesOfResturant();
+
+		if (optionalResturant.isPresent())
+		{
+			TablesOfResturant tablesOfResturant = new TablesOfResturant();
 			Resturant resturant = optionalResturant.get();
 			tablesOfResturant.setResturant(resturant);
 			tableofResturentRepository.save(tablesOfResturant);
 			return ResponseEntity.ok(tablesOfResturant);
-		}else {
-			return ResponseEntity.notFound().build();
-		}
-	}
-	
-	
-	@GetMapping("/getorderbytable/{restid}/{tableid}")
-	public ResponseEntity<TablesOfResturant> getOrderedMenusByTable(@PathVariable("restid") int restid, @PathVariable("tableid") int tableid)
-	{
-		 Optional<TablesOfResturant> findByIdAndResturant_id = tableofResturentRepository.findByIdAndResturant_id(tableid,restid);
-		
-		if(findByIdAndResturant_id.isPresent())
+		} else
 		{
-			TablesOfResturant tablesOfResturant = findByIdAndResturant_id.get();
-			return ResponseEntity.ok(tablesOfResturant);
-		}else {
 			return ResponseEntity.notFound().build();
 		}
 	}
 
-	
-	
+	@GetMapping("/getorderbytable/{restid}/{tableid}")
+	public ResponseEntity<TablesOfResturant> getOrderedMenusByTable(@PathVariable("restid") int restid,
+			@PathVariable("tableid") int tableid)
+	{
+		Optional<TablesOfResturant> findByIdAndResturant_id = tableofResturentRepository
+				.findByIdAndResturant_id(tableid, restid);
+
+		if (findByIdAndResturant_id.isPresent())
+		{
+			TablesOfResturant tablesOfResturant = findByIdAndResturant_id.get();
+			return ResponseEntity.ok(tablesOfResturant);
+		} else
+		{
+			return ResponseEntity.notFound().build();
+		}
+	}
+
 	@GetMapping("/gettableswithstatus/{restid}")
-	public ResponseEntity<List<Map<String, Object>>> getalltableswithstatus(@PathVariable("restid")int restid)
+	public ResponseEntity<List<Map<String, Object>>> getalltableswithstatus(@PathVariable("restid") int restid)
 	{
 		Optional<List<TablesOfResturant>> findByResturant_id = tableofResturentRepository.findByResturant_id(restid);
-		
-		if(findByResturant_id.isPresent())
+
+		if (findByResturant_id.isPresent())
 		{
 			try
 			{
 				List<TablesOfResturant> tablesOfResturantList = findByResturant_id.get();
-				
+
 				List<Map<String, Object>> responseList = new ArrayList<>();
-				
-				for(TablesOfResturant tablesOfResturant : tablesOfResturantList)
+
+				for (TablesOfResturant tablesOfResturant : tablesOfResturantList)
 				{
 					Map<String, Object> tableMap = new HashMap<>();
 					tableMap.put("id", tablesOfResturant.getId());
 					tableMap.put("status", tablesOfResturant.getStatus());
 					responseList.add(tableMap);
 				}
-				
+
 				return ResponseEntity.ok().body(responseList);
-				
+
 			} catch (Exception e)
 			{
 				return ResponseEntity.internalServerError().build();
 			}
-			
-		}else {
+
+		} else
+		{
 			return ResponseEntity.notFound().build();
 		}
 	}
+
 	
-	
-	
-	
-	
+
 }
