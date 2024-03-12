@@ -884,9 +884,12 @@ public class OrderMenusController
 				customer.setLocaldatetime(LocalDateTime.now());
 
 				customerRepos.save(customer);
+				
+				float totalbill = 0;
 
 				for (Order_menus order_menus : listoforder)
 				{
+					totalbill += order_menus.getTotalprice();
 					Previousdata previousdata = new Previousdata();
 					previousdata.setCustomer(customer);
 					previousdata.setMenus(order_menus.getMenus());
@@ -895,6 +898,10 @@ public class OrderMenusController
 					previousdataRepos.save(previousdata);
 
 				}
+				float discount = resturant.getAdditionaldiscount();
+				totalbill = totalbill - (totalbill * discount /100);
+				customer.setTotalbill(totalbill);
+				customerRepos.save(customer);
 
 //				set vacant table
 				tablesOfResturant.setCname(null);
@@ -930,24 +937,6 @@ public class OrderMenusController
 	}
 	
 	
-//	API for the get the todays data like new order/ total sell 
-//	@GetMapping("/sell/daysell/restaurant/{restid}/get")
-//	public ResponseEntity<Object> getDaysell(@PathVariable("restid") int restid)
-//	{
-//	
-//		try
-//		{
-//			List<Customer> getdatabydate = customerRepos.findByLocalDateTimeDate(LocalDate.now());
-//			if(!getdatabydate.isEmpty())
-//			{
-//				return ResponseEntity.ok(getdatabydate);
-//			}else {
-//				return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Data not Found");
-//			}
-//		} catch (Exception e)
-//		{
-//			return ResponseEntity.internalServerError().body("Internal Server Error");
-//		}
-//	}
+
 
 }

@@ -36,9 +36,13 @@ public class Customer
 	private long cphone;
 	
 	private LocalDateTime localdatetime;
+	
+	private float totalbill;
 
-	public Customer(int id, Resturant resturant, List<Previousdata> customers, String cname, long cphone,
-			LocalDateTime localdatetime)
+	
+
+	public Customer(long id, Resturant resturant, List<Previousdata> customers, String cname, long cphone,
+			LocalDateTime localdatetime, float totalbill)
 	{
 		super();
 		this.id = id;
@@ -47,7 +51,10 @@ public class Customer
 		this.cname = cname;
 		this.cphone = cphone;
 		this.localdatetime = localdatetime;
+		this.totalbill = totalbill;
 	}
+
+
 
 	public Customer()
 	{
@@ -55,6 +62,20 @@ public class Customer
 	}
 
 	
+
+	public float getTotalbill()
+	{
+		return totalbill;
+	}
+
+
+
+	public void setTotalbill(float totalbill)
+	{
+		this.totalbill = totalbill;
+	}
+
+
 
 	public long getId()
 	{
