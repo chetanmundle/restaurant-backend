@@ -1,6 +1,7 @@
 package com.api.resturentapplication.controllers;
 
 import java.util.Map;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,6 +12,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -889,6 +891,7 @@ public class OrderMenusController
 					previousdata.setCustomer(customer);
 					previousdata.setMenus(order_menus.getMenus());
 					previousdata.setQuantity(order_menus.getQuantity());
+					previousdata.setDate(LocalDate.now());
 					previousdataRepos.save(previousdata);
 
 				}
@@ -916,6 +919,7 @@ public class OrderMenusController
 
 	}
 
+//	This is for the delete the unwanted entries of the added cart by others
 	@Scheduled(fixedDelay = 600000) 
 	public void deleteOldData()
 	{
@@ -924,5 +928,26 @@ public class OrderMenusController
 		orderMenusRepository.deleteAll(entities);
 		System.out.println("Deleted old data: " + entities.size() + " entries.");
 	}
+	
+	
+//	API for the get the todays data like new order/ total sell 
+//	@GetMapping("/sell/daysell/restaurant/{restid}/get")
+//	public ResponseEntity<Object> getDaysell(@PathVariable("restid") int restid)
+//	{
+//	
+//		try
+//		{
+//			List<Customer> getdatabydate = customerRepos.findByLocalDateTimeDate(LocalDate.now());
+//			if(!getdatabydate.isEmpty())
+//			{
+//				return ResponseEntity.ok(getdatabydate);
+//			}else {
+//				return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Data not Found");
+//			}
+//		} catch (Exception e)
+//		{
+//			return ResponseEntity.internalServerError().body("Internal Server Error");
+//		}
+//	}
 
 }

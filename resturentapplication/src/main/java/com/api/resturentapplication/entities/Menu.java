@@ -32,8 +32,10 @@ public class Menu
 	@JsonIgnore
 	private Resturant resturant;
 
+	@Column(nullable = false)
 	private String name;
 
+	@Column(nullable = false)
 	private boolean isveg;
 
 	private int discount;
@@ -48,11 +50,12 @@ public class Menu
 
 	private int calories;
 	
+	@Column(nullable = false)
 	private int price;
 
 	private String fooddetails;
 
-	
+	@Column(nullable = false)
 	private String foodimg;
  
 	@OneToMany(mappedBy = "menus", cascade = CascadeType.ALL)
