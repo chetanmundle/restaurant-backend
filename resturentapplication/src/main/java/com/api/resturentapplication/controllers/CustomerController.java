@@ -52,7 +52,7 @@ public class CustomerController
 			if (!getdatabydate.isEmpty())
 			{
 				
-				float totalSalesOfDay = 0;
+				float totalSalesOfDay = 0; 
 
 				for (Customer customer : getdatabydate)
 				{
